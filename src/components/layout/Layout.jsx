@@ -7,9 +7,10 @@ function Layout() {
 			<Navbar>
 				<div className="flex-1">
 					<Button tag={Link} to="/" className="text-xl normal-case" color="ghost">
-						Typeahead Example
+						Home
 					</Button>
 				</div>
+				
 				<div className="flex-none">
 					<Menu horizontal={true} className="px-1">
 						<Menu.Item>

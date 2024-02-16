@@ -15,29 +15,10 @@ function VenueList({ venues = [] }) {
 }
 
 VenueList.propTypes = {
-	venues: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.string.isRequired,
-      name: PropTypes.string.isRequired,
-      description: PropTypes.string.isRequired,
-      media: PropTypes.arrayOf(
-        PropTypes.shape({
-          url: PropTypes.string.isRequired,
-          alt: PropTypes.string,
-        })
-      ).isRequired,
-      price: PropTypes.number,
-      maxGuests: PropTypes.number,
-      rating: PropTypes.number,
-      created: PropTypes.string,
-      updated: PropTypes.string,
-      meta: PropTypes.object,
-      location: PropTypes.object,
-      owner: PropTypes.object,
-      bookings: PropTypes.arrayOf(PropTypes.object),
-      _count: PropTypes.object,
-    })
-  ),
+  data: PropTypes.shape({
+    name: PropTypes.string.isRequired,
+    description: PropTypes.string.isRequired,
+    media: PropTypes.arrayOf(PropTypes.string).isRequired, // Confirming it expects an array of strings
+  }).isRequired,
 };
-
 export default VenueList;

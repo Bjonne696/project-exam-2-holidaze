@@ -5,11 +5,12 @@ import PropTypes from 'prop-types';
 function VenueItem({ data }) {
   // Assuming the first media item is the primary image for the venue
   const { name, description, media } = data;
-  const image = media.length > 0 ? media[0].url : ''; // Fallback to an empty string if no media
+  // Directly use the first item of media assuming it's a URL string
+  const image = media.length > 0 ? media[0] : ''; // No need for .url since media is an array of strings
 
   return (
     <Card imageFull className="flex-auto">
-      <Card.Image src={image} alt={name} />
+      <Card.Image src={image} alt={name} className="object-cover" loading="lazy" /> {/* Ensure object-fit and lazy loading */}
       <Card.Body>
         <Card.Title tag="h2" className="text-white">
           {name}
@@ -20,17 +21,27 @@ function VenueItem({ data }) {
   );
 }
 
+VenueItem.propTypes = {
+  venues: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.string.isRequired,
+      name: PropTypes.string.isRequired,
+      description: PropTypes.string.isRequired,
+      media: PropTypes.arrayOf(PropTypes.string).isRequired, // Updated to expect an array of strings
+      price: PropTypes.number,
+      maxGuests: PropTypes.number,
+      rating: PropTypes.number,
+      created: PropTypes.string,
+      updated: PropTypes.string,
+      meta: PropTypes.object,
+      location: PropTypes.object,
+      owner: PropTypes.object,
+      bookings: PropTypes.arrayOf(PropTypes.object),
+      _count: PropTypes.object,
+    })
+  ),
+};
+
 export default VenueItem;
 
-VenueItem.propTypes = {
-  data: PropTypes.shape({
-    name: PropTypes.string.isRequired,
-    description: PropTypes.string.isRequired,
-    media: PropTypes.arrayOf(
-      PropTypes.shape({
-        url: PropTypes.string.isRequired,
-        alt: PropTypes.string,
-      })
-    ).isRequired,
-  }).isRequired,
-};
+

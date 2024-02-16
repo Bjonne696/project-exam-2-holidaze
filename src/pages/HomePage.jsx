@@ -2,7 +2,7 @@ import { Loading, Input } from "react-daisyui";
 import VenueList from "../components/venues/VenueList";
 import { useFetch } from "../hooks/useFetch";
 import VenueFilter from "../components/venues/VenueFilter";
-import { BASE_URL } from "../constants/api";
+import { BASE_URL } from "../constants/apiVenues";
 
 export default function HomePage() {
 	const { data: venues, isLoading, error } = useFetch(BASE_URL);
