@@ -1,24 +1,29 @@
-import React from 'react'; // Ensure React is imported when using JSX
+import React from 'react';
 import VenueItem from './VenueItem';
 import PropTypes from 'prop-types';
+import { VenueGrid, VenueWrapper } from '../styles/StyledVenues';
 
 function VenueList({ venues = [] }) {
   return (
-    <div className="grid auto-rows-fr grid-cols-1 sm:grid-cols-2 md:grid-cols-4 xl:grid-cols-6 gap-4">
+    <VenueGrid>
       {venues.map((venue) => (
-        <div key={venue.id} className="flex flex-col">
+        <VenueWrapper key={venue.id}>
           <VenueItem data={venue} />
-        </div>
+        </VenueWrapper>
       ))}
-    </div>
+    </VenueGrid>
   );
 }
 
 VenueList.propTypes = {
-  data: PropTypes.shape({
-    name: PropTypes.string.isRequired,
-    description: PropTypes.string.isRequired,
-    media: PropTypes.arrayOf(PropTypes.string).isRequired, // Confirming it expects an array of strings
-  }).isRequired,
+  venues: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+      name: PropTypes.string,
+      description: PropTypes.string,
+      media: PropTypes.arrayOf(PropTypes.string),
+    })
+  ),
 };
+
 export default VenueList;

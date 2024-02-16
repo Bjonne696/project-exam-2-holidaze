@@ -1,23 +1,21 @@
 import React from 'react'; // Ensure React is imported when using JSX
 import { Card } from 'react-daisyui';
 import PropTypes from 'prop-types';
+import { StyledCard, StyledImage, StyledTitle, StyledDescription } from "../styles/StyledVenues";
+
 
 function VenueItem({ data }) {
-  // Assuming the first media item is the primary image for the venue
   const { name, description, media } = data;
-  // Directly use the first item of media assuming it's a URL string
-  const image = media.length > 0 ? media[0] : ''; // No need for .url since media is an array of strings
+  const image = media.length > 0 ? media[0] : '';
 
   return (
-    <Card imageFull className="flex-auto">
-      <Card.Image src={image} alt={name} className="object-cover" loading="lazy" /> {/* Ensure object-fit and lazy loading */}
+    <StyledCard imageFull>
+      <StyledImage src={image} alt={name} loading="lazy" />
       <Card.Body>
-        <Card.Title tag="h2" className="text-white">
-          {name}
-        </Card.Title>
-        <p className="text-white">{description}</p>
+        <StyledTitle tag="h2">{name}</StyledTitle>
+        <StyledDescription>{description}</StyledDescription>
       </Card.Body>
-    </Card>
+    </StyledCard>
   );
 }
 
