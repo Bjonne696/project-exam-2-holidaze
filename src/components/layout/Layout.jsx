@@ -1,13 +1,23 @@
-import React, { useEffect } from 'react'; // Ensure useEffect is imported
+import React, { useEffect } from 'react';
 import { Button, Menu, Navbar } from "react-daisyui";
 import { Link, NavLink, Outlet } from "react-router-dom";
-import { logAuthStatus } from '../../stores/authStore'; // Adjust the import path as necessary
+import useAuthStore from '../../stores/authStore'; // Adjusted import
 
 function Layout() {
-  // Use useEffect to call logAuthStatus when the component mounts
+  const { logoutUser, token, user } = useAuthStore(state => ({
+    logoutUser: state.logoutUser,
+    token: state.token,
+    user: state.user // Accessing the user object from the store
+  }));
+
+  const isAuthenticated = !!token; // Determine if user is authenticated
+  const isVenueManager = user?.venueManager; // Determine if user is a venue manager
+
   useEffect(() => {
-    logAuthStatus();
-  }, []); // The empty dependency array means this effect runs once on mount
+    // Log authentication status and venue manager status
+    console.log(`Logged in: ${isAuthenticated}`);
+    console.log(`Venue Manager: ${isVenueManager}`);
+  }, [isAuthenticated, isVenueManager]); // Dependency array includes both states
 
   return (
     <>
@@ -23,17 +33,21 @@ function Layout() {
             <Menu.Item>
               <NavLink to="/">Home</NavLink>
             </Menu.Item>
-            {/* Login and Register Links */}
-            <Menu.Item>
-              <Link to="/login" className="btn btn-primary">
-                Login
-              </Link>
-            </Menu.Item>
-            <Menu.Item>
-              <Link to="/register" className="btn btn-secondary">
-                Register
-              </Link>
-            </Menu.Item>
+            {/* Conditional rendering based on isAuthenticated */}
+            {isAuthenticated ? (
+              <Menu.Item>
+                <button onClick={logoutUser} className="btn btn-secondary">Logout</button>
+              </Menu.Item>
+            ) : (
+              <>
+                <Menu.Item>
+                  <Link to="/login" className="btn btn-primary">Login</Link>
+                </Menu.Item>
+                <Menu.Item>
+                  <Link to="/register" className="btn btn-secondary">Register</Link>
+                </Menu.Item>
+              </>
+            )}
           </Menu>
         </div>
       </Navbar>

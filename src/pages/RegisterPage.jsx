@@ -1,27 +1,31 @@
-// src/pages/RegisterPage.jsx
 import { useState } from 'react';
 import useAuthStore from '../stores/authStore';
-import { Link } from 'react-router-dom';
-
+import { Link, useNavigate } from 'react-router-dom'; // Add useNavigate to the import
 
 const RegisterPage = () => {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState({ // Corrected variable name from userData to formData
     name: '',
     email: '',
     password: '',
     venueManager: false,
   });
   const registerUser = useAuthStore((state) => state.registerUser);
+  const navigate = useNavigate(); // Correct usage since useNavigate is now imported
 
   const handleChange = (e) => {
     const value = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
-    setFormData({ ...formData, [e.target.name]: value });
+    setFormData({ ...formData, [e.target.name]: value }); // Corrected from setUserData to setFormData
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await registerUser(formData);
-    // Redirect or show success message
+    try {
+      await registerUser(formData); // Corrected from userData to formData
+      navigate('/'); // Redirect to HomePage after successful registration
+    } catch (error) {
+      console.error("Registration failed:", error);
+      // Optionally handle errors here
+    }
   };
 
   return (
