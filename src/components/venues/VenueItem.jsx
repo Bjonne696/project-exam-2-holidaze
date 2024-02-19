@@ -1,81 +1,48 @@
 import React, { useState } from 'react';
-import { Card } from 'react-daisyui';
 import PropTypes from 'prop-types';
-import { StyledCard, StyledImage, StyledTitle, CardFlexContainer, StyledRating, StyledMaxGuests, StyledPrice } from "../styles/StyledVenues";
+import { Card } from 'react-daisyui';
+import { Link } from 'react-router-dom';
 
 const VenueItem = ({ data, isDetailedView = false }) => {
   const { name, description, media, rating, maxGuests, price, created, updated, meta, location, owner, bookings } = data;
-  const [imageError, setImageError] = useState(false); // Track if there's an error loading the image
+  const [imageError, setImageError] = useState(false);
   const imageSrc = media.length > 0 ? media[0] : null;
 
   const imageContent = imageSrc && !imageError ? (
-    <StyledImage src={imageSrc} alt={name} onError={() => setImageError(true)} />
+    <img src={imageSrc} alt={name} onError={() => setImageError(true)} className="h-52 w-full object-cover block rounded-t-lg" />
   ) : (
-    <h2>No image found</h2> // Display this message if there's no image or if an error occurred
+    <h2 className="text-lg font-semibold">No image found</h2>
   );
 
-  // For the detailed view without a Card
   if (isDetailedView) {
     return (
-      <div>
+      <div className="bg-white shadow-lg rounded-lg overflow-hidden">
         {imageContent}
-        <h2>{name}</h2>
-        <p>Description: {description}</p>
-        <p>Rating: {rating} ★</p>
-        <p>Max Guests: {maxGuests}</p>
-        <p>Price: ${price}</p>
-        <p>Created: {new Date(created).toLocaleDateString()}</p>
-        <p>Updated: {new Date(updated).toLocaleDateString()}</p>
-        {meta && (
-          <div>
-            <p>Meta Information:</p>
-            {/* Assuming meta is an object with keys you want to display */}
-            {Object.keys(meta).map(key => (
-              <p key={key}>{`${key.charAt(0).toUpperCase() + key.slice(1)}: ${meta[key]}`}</p>
-            ))}
-          </div>
-        )}
-        {location && (
-          <div>
-            <p>Location:</p>
-            <p>Address: {location.address}</p>
-            <p>City: {location.city}</p>
-            <p>Zip: {location.zip}</p>
-            <p>Country: {location.country}</p>
-            {/* Add more location details if available */}
-          </div>
-        )}
-        {owner && (
-          <div>
-            <p>Owner:</p>
-            <p>Name: {owner.name}</p>
-            <p>Email: {owner.email}</p>
-            {/* Display more owner details if available */}
-          </div>
-        )}
-        {bookings && bookings.length > 0 && (
-          <div>
-            <p>Bookings:</p>
-            {bookings.map((booking, index) => (
-              <p key={index}>From: {new Date(booking.dateFrom).toLocaleDateString()} To: {new Date(booking.dateTo).toLocaleDateString()}, Guests: {booking.guests}</p>
-            ))}
-          </div>
-        )}
+        <div className="p-4">
+          <h2 className="text-xl font-bold">{name}</h2>
+          <p className="mt-2 text-gray-600">{description}</p>
+          <p className="mt-2"><span className="font-bold">Rating:</span> {rating} ★</p>
+          <p><span className="font-bold">Max Guests:</span> {maxGuests}</p>
+          <p><span className="font-bold">Price:</span> ${price}</p>
+          <p><span className="font-bold">Created:</span> {new Date(created).toLocaleDateString()}</p>
+          <p><span className="font-bold">Updated:</span> {new Date(updated).toLocaleDateString()}</p>
+          {/* Render additional details as needed */}
+        </div>
       </div>
     );
   }
 
-  // For the summary view in a Card
+  // For the summary view
   return (
-    <StyledCard>
+    <Card className="flex flex-col min-h-[360px] w-[280px] overflow-hidden">
       {imageContent}
-      <Card.Body>
-        <StyledTitle>{name}</StyledTitle>
-        <StyledRating>{rating} ★</StyledRating>
-        <StyledMaxGuests>Max Guests: {maxGuests}</StyledMaxGuests>
-        <StyledPrice>${price}</StyledPrice>
-      </Card.Body>
-    </StyledCard>
+      <div className="p-4 flex-1">
+        <h3 className="text-lg font-semibold">{name}</h3>
+        <div className="text-gray-800">{rating} ★</div>
+        <div className="mt-2"><span className="font-bold">Max Guests:</span> {maxGuests}</div>
+        <div className="mt-2"><span className="font-bold">Price:</span> ${price}</div>
+      </div>
+    </Card>
   );
 };
 

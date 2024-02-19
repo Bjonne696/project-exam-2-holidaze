@@ -2,19 +2,18 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import VenueItem from './VenueItem';
 import PropTypes from 'prop-types';
-import { VenueGrid, VenueWrapper } from '../styles/StyledVenues';
 
 const VenueList = ({ venues }) => {
   return (
-    <VenueGrid>
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4"> {/* Adjusted for Tailwind CSS grid */}
       {venues.map(venue => (
-        <VenueWrapper key={venue.id}>
-          <Link to={`/venue/${venue.id}`} style={{ textDecoration: 'none' }}>
+        <div key={venue.id} className="flex flex-col"> {/* This div replaces VenueWrapper */}
+          <Link to={`/venue/${venue.id}`} className="no-underline"> {/* Tailwind CSS class for no underline */}
             <VenueItem data={venue} summary={true} />
           </Link>
-        </VenueWrapper>
+        </div>
       ))}
-    </VenueGrid>
+    </div>
   );
 };
 

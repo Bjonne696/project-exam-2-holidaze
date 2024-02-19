@@ -1,28 +1,27 @@
-import { Loading, Input } from "react-daisyui";
+import React, { useEffect } from 'react';
+
+import useVenuesStore from '../stores/venuesStore';
 import VenueList from "../components/venues/VenueList";
-import { useFetch } from "../hooks/useFetch";
 import VenueFilter from "../components/venues/VenueFilter";
-import { BASE_URL } from "../constants/apiVenues";
 
-export default function HomePage() {
-	const { data: venues, isLoading, error } = useFetch(BASE_URL);
 
-	if (isLoading) {
-		return <Loading />;
-	}
-
-	if (error) {
-		return (
-			<Alert>
-				<span>{error}</span>
-			</Alert>
-		);
-	}
-
+const HomePage = () => {
+	const { venues, isLoading, error, fetchVenues } = useVenuesStore();
+  
+	useEffect(() => {
+	  fetchVenues();
+	}, [fetchVenues]);
+  
+	if (isLoading) return <div>Loading...</div>;
+	if (error) return <div>Error: {error.message}</div>;
+  
 	return (
-		<div className="container mx-auto">
-			<VenueFilter venues={venues} />
-			<VenueList venues={venues} />
-		</div>
+	  <div className="container mx-auto">
+		<VenueFilter venues={venues} />
+		<VenueList venues={venues} />
+	  </div>
 	);
-}
+  };
+  
+  export default HomePage;
+
