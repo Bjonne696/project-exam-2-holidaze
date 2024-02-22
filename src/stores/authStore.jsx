@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+
 import { fetchRegisterUser, fetchLoginUser } from '../hooks/authService';
 
 const useAuthStore = create((set) => ({
@@ -57,4 +58,6 @@ const decodeToken = (token) => {
   return JSON.parse(jsonPayload);
 };
 
+
 export default useAuthStore;
+export { decodeToken }; 

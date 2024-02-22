@@ -37,6 +37,7 @@ function Layout() {
             {isAuthenticated ? (
               <Menu.Item>
                 <button onClick={logoutUser} className="btn btn-secondary">Logout</button>
+                <Link to="/profile">Profile</Link>
               </Menu.Item>
             ) : (
               <>

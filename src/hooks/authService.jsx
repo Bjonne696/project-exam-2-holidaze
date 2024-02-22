@@ -1,5 +1,5 @@
 // src/hooks/authService.jsx
-import { BASE_URL } from '../constants/api';
+import BASE_URL from '../constants/api';
 
 
 export const fetchRegisterUser = async (userData) => {

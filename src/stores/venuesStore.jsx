@@ -1,6 +1,6 @@
 // src/stores/venuesStore.js
 import { create } from 'zustand';
-import { BASE_URL } from '.././constants/api';
+import BASE_URL from '.././constants/api';
 
 const useVenuesStore = create((set) => ({
   venues: [],
