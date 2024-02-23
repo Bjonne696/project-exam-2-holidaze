@@ -1,19 +1,17 @@
-// src/pages/ProfilePage.jsx
 import React from "react";
 import { useQuery } from '@tanstack/react-query';
 import { fetchUserBookings } from '../hooks/fetchUserBookings';
 import useAuthStore, { decodeToken } from '../stores/authStore';
 
-
 function ProfilePage() {
     const { token } = useAuthStore(state => ({ token: state.token }));
     const decodedToken = token ? decodeToken(token) : null;
-    const userId = decodedToken ? decodedToken.userId : null; // Assuming 'userId' is the key in the decoded token
+    const name = decodedToken ? decodedToken.name : null;
 
     const { data: bookings, error, isLoading } = useQuery({
-        queryKey: ['bookings', userId],
-        queryFn: () => fetchUserBookings(userId, token),
-        enabled: !!userId && !!token,
+        queryKey: ['bookings', name], // Use the name variable here
+        queryFn: () => fetchUserBookings(name, token), // And here
+        enabled: !!name && !!token,
     });
 
     if (isLoading) return <div>Loading...</div>;

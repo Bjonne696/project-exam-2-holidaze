@@ -1,3 +1,5 @@
+//src\stores\authStore.jsx:
+
 import { create } from 'zustand';
 
 import { fetchRegisterUser, fetchLoginUser } from '../hooks/authService';

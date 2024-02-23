@@ -1,4 +1,5 @@
-// src/stores/venuesStore.js
+//src/stores/venuesStore.jsx
+
 import { create } from 'zustand';
 import BASE_URL from '.././constants/api';
 
