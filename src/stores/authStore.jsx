@@ -1,5 +1,3 @@
-//src\stores\authStore.jsx:
-
 import { create } from 'zustand';
 
 import { fetchRegisterUser, fetchLoginUser } from '../hooks/authService';
@@ -36,10 +34,18 @@ const useAuthStore = create((set) => ({
       set({ error: error.message });
     }
   },
-  logoutUser: () => { // Correct placement of logoutUser function
+  logoutUser: () => {
     set({ user: null, token: null, error: null });
     localStorage.removeItem('token');
     console.log("Logged out successfully");
+  },
+  setIsVenueManager: (isManager) => {
+    set((state) => ({
+      user: { ...state.user, venueManager: isManager }
+    }));
+    // Optionally, update localStorage or session state if necessary
+    const updatedUser = { ...state.user, venueManager: isManager };
+    localStorage.setItem('user', JSON.stringify(updatedUser)); // Assuming you want to persist this in local storage
   },
 }));
 
@@ -60,6 +66,5 @@ const decodeToken = (token) => {
   return JSON.parse(jsonPayload);
 };
 
-
 export default useAuthStore;
-export { decodeToken }; 
+export { decodeToken };

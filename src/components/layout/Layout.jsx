@@ -1,14 +1,16 @@
 import React, { useEffect } from 'react';
 import { Button, Menu, Navbar } from "react-daisyui";
-import { Link, NavLink, Outlet } from "react-router-dom";
+import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
 import useAuthStore from '../../stores/authStore'; // Adjusted import
 
 function Layout() {
-  const { logoutUser, token, user } = useAuthStore(state => ({
+  const { logoutUser, token, user, setIsVenueManager } = useAuthStore(state => ({
     logoutUser: state.logoutUser,
     token: state.token,
-    user: state.user // Accessing the user object from the store
+    user: state.user, // Accessing the user object from the store
+    setIsVenueManager: state.setIsVenueManager,
   }));
+  const navigate = useNavigate();
 
   const isAuthenticated = !!token; // Determine if user is authenticated
   const isVenueManager = user?.venueManager; // Determine if user is a venue manager
@@ -18,6 +20,12 @@ function Layout() {
     console.log(`Logged in: ${isAuthenticated}`);
     console.log(`Venue Manager: ${isVenueManager}`);
   }, [isAuthenticated, isVenueManager]); // Dependency array includes both states
+
+  const handleRevokeManager = () => {
+    // Here you would call an API to revoke the manager status or directly update the state
+    setIsVenueManager(false);
+    navigate('/profile'); // Redirect the user to their profile page after revoking manager status
+  };
 
   return (
     <>
@@ -33,12 +41,26 @@ function Layout() {
             <Menu.Item>
               <NavLink to="/">Home</NavLink>
             </Menu.Item>
+            {isVenueManager && (
+              <Menu.Item>
+                <NavLink to="/manager-profile">Manager Dashboard</NavLink>
+              </Menu.Item>
+            )}
             {/* Conditional rendering based on isAuthenticated */}
             {isAuthenticated ? (
-              <Menu.Item>
-                <button onClick={logoutUser} className="btn btn-secondary">Logout</button>
-                <Link to="/profile">Profile</Link>
-              </Menu.Item>
+              <>
+                <Menu.Item>
+                  <button onClick={logoutUser} className="btn btn-secondary">Logout</button>
+                </Menu.Item>
+                <Menu.Item>
+                  <NavLink to="/profile">Profile</NavLink>
+                </Menu.Item>
+                {isVenueManager && (
+                  <Menu.Item>
+                    <button onClick={handleRevokeManager} className="btn btn-warning">Revoke Manager</button>
+                  </Menu.Item>
+                )}
+              </>
             ) : (
               <>
                 <Menu.Item>

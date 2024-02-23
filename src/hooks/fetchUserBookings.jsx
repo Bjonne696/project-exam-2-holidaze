@@ -1,24 +1,57 @@
 import BASE_URL from "../constants/api.js";
 
-export const fetchUserBookings = async (name, token) => {
-    console.log(`Fetching bookings for user ID: ${name} with token: ${token}`);
-    const response = await fetch(`${BASE_URL}/profiles/${name}/bookings`, {
+// Fetches user bookings
+export const fetchUserBookings = async (token) => {
+    const response = await fetch(`${BASE_URL}/bookings`, {
         headers: {
             Authorization: `Bearer ${token}`,
         },
     });
 
-    console.log('Response status:', response.status);
-
     if (!response.ok) {
-        const message = `An error has occured: ${response.status}`;
-        console.error(message, response);
+        const message = `An error has occurred: ${response.status}`;
         throw new Error(message);
     }
 
-    const data = await response.json();
-    console.log('Fetched bookings data:', data);
-    return data;
+    return response.json();
+};
+
+// Attempts to set the user's venueManager status to true
+export const becomeVenueManager = async ({ token, name }) => {
+    const response = await fetch(`${BASE_URL}/profiles/${name}`, {
+        method: 'PUT',
+        headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ venueManager: true }),
+    });
+
+    if (!response.ok) {
+        const message = `An error has occurred: ${response.status}`;
+        throw new Error(message);
+    }
+
+    return response.json();
+};
+
+// Corrected function to revoke venue manager status, including missing parameter and fixing fetch call structure
+export const revokeVenueManagerStatus = async ({ token, name }) => {
+    const response = await fetch(`${BASE_URL}/profiles/${name}`, {
+        method: 'PUT',
+        headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ venueManager: false }),
+    });
+
+    if (!response.ok) {
+        const message = `An error has occurred: ${response.status}`;
+        throw new Error(message);
+    }
+
+    return response.json();
 };
 
 export default fetchUserBookings;
