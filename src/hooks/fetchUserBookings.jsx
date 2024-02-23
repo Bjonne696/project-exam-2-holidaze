@@ -1,8 +1,8 @@
 import BASE_URL from "../constants/api.js";
 
-export const fetchUserBookings = async (userId, token) => {
-    console.log(`Fetching bookings for user ID: ${userId} with token: ${token}`);
-    const response = await fetch(`${BASE_URL}/profiles/${userId}/bookings`, {
+export const fetchUserBookings = async (name, token) => {
+    console.log(`Fetching bookings for user ID: ${name} with token: ${token}`);
+    const response = await fetch(`${BASE_URL}/profiles/${name}/bookings`, {
         headers: {
             Authorization: `Bearer ${token}`,
         },

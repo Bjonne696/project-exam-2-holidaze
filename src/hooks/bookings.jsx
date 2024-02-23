@@ -1,4 +1,5 @@
-// bookings.js
+// src\hooks\bookings.jsx
+
 const BASE_URL = "https://api.noroff.dev/api/v1/holidaze"; // Adjusted to match the provided API base URL
 
 // Fetch all bookings, assuming that filtering by venue ID will be handled client-side or requires a different approach
