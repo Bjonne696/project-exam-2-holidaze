@@ -1,18 +1,36 @@
 import React from "react";
-import { useQuery } from '@tanstack/react-query';
-import { fetchUserBookings } from '../hooks/fetchUserBookings';
-import useAuthStore, { decodeToken } from '../stores/authStore';
+import { useQuery, useMutation } from '@tanstack/react-query';
+import { fetchUserBookings, becomeVenueManager } from '../hooks/fetchUserBookings';
+import useAuthStore from '../stores/authStore';
+import { useNavigate } from 'react-router-dom';
 
 function ProfilePage() {
-    const { token } = useAuthStore(state => ({ token: state.token }));
-    const decodedToken = token ? decodeToken(token) : null;
-    const name = decodedToken ? decodedToken.name : null;
+    const { token, user, setIsVenueManager } = useAuthStore(state => ({
+        token: state.token,
+        user: state.user,
+        setIsVenueManager: state.setIsVenueManager,
+    }));
+    const navigate = useNavigate();
 
+    // Updated useQuery call for React Query v5
     const { data: bookings, error, isLoading } = useQuery({
-        queryKey: ['bookings', name], // Use the name variable here
-        queryFn: () => fetchUserBookings(name, token), // And here
-        enabled: !!name && !!token,
+        queryKey: ['bookings'],
+        queryFn: () => fetchUserBookings(token),
+        enabled: !!token,
     });
+
+    // Updated useMutation call for React Query v5
+    const mutation = useMutation({
+        mutationFn: () => becomeVenueManager({ token, name: user?.name }),
+        onSuccess: () => {
+            setIsVenueManager(true);
+            navigate('/manager-profile');
+        },
+    });
+
+    const handleBecomeManager = () => {
+        mutation.mutate();
+    };
 
     if (isLoading) return <div>Loading...</div>;
     if (error) return <div>Error: {error.message}</div>;
@@ -24,12 +42,13 @@ function ProfilePage() {
                     <div key={booking.id}>
                         <p>Date From: {new Date(booking.dateFrom).toLocaleDateString()}</p>
                         <p>Date To: {new Date(booking.dateTo).toLocaleDateString()}</p>
-                        {/* Display other booking details */}
+                        {/* Additional booking details can be displayed here */}
                     </div>
                 ))
             ) : (
                 <p>No bookings found.</p>
             )}
+            <button onClick={handleBecomeManager} className="btn btn-primary">Become Venue Manager</button>
         </div>
     );
 }
