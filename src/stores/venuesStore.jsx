@@ -1,4 +1,4 @@
-//src/stores/venuesStore.jsx
+// project-exam-2-holidaze/src/stores/vanuesStore.jsx
 
 import { create } from 'zustand';
 import BASE_URL from '.././constants/api';

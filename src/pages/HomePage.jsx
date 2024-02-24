@@ -1,3 +1,5 @@
+// project-exam-2-holidaze/src/pages/HomePage.jsx
+
 import React, { useEffect } from 'react';
 
 import useVenuesStore from '../stores/venuesStore';

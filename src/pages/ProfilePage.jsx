@@ -1,3 +1,5 @@
+// project-exam-2-holidaze/src/pages/ProfilePage.jsx
+
 import React from "react";
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { fetchUserBookings, becomeVenueManager } from '../hooks/fetchUserBookings';

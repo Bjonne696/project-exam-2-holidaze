@@ -1,3 +1,5 @@
+// project-exam-2-holidaze/src/pages/LoginPage.jsx
+
 import React, { useState } from 'react';
 import useAuthStore from '../stores/authStore';
 import { Link, useNavigate } from 'react-router-dom'; // Ensure useNavigate is imported

@@ -1,4 +1,4 @@
-// src\hooks\bookings.jsx
+// project-exam-2-holidaze/src/hooks/bookings.jsx
 
 const BASE_URL = "https://api.noroff.dev/api/v1/holidaze"; // Adjusted to match the provided API base URL
 

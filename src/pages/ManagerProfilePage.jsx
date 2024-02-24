@@ -1,24 +1,23 @@
+// project-exam-2-holidaze/src/pages/MangerProfilePage.jsx
+
 import React from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { Link, useNavigate } from 'react-router-dom';
 import useAuthStore from '../stores/authStore';
-import { revokeVenueManagerStatus } from '../hooks/fetchUserBookings'; // Assuming this is the correct import
-
+import { revokeVenueManagerStatus } from '../hooks/fetchUserBookings';
 
 const ManagerProfilePage = () => {
-    const { token, setIsVenueManager } = useAuthStore(state => ({
-        token: state.token,
-        setIsVenueManager: state.setIsVenueManager,
-    }));
     const navigate = useNavigate();
+    const { token, user, setIsVenueManager } = useAuthStore();
 
-    // Assuming revokeVenueManagerStatus is similar to becomeVenueManager but sets venueManager to false
-    const mutation = useMutation(() => revokeVenueManagerStatus({ token }), {
+    const mutation = useMutation({
+        mutationFn: () => revokeVenueManagerStatus({ token, name: user?.name }),
         onSuccess: () => {
-            // Update local state to reflect the user is no longer a venue manager
             setIsVenueManager(false);
-            // Redirect to profile page or home page as appropriate
-            navigate('/profile'); // Assuming you have a profile page route
+            navigate('/profile');
+        },
+        onError: (error) => {
+            console.error('Error revoking manager status:', error);
         },
     });
 
@@ -28,12 +27,14 @@ const ManagerProfilePage = () => {
 
     return (
         <div className="container mx-auto">
-            <h1 className="text-xl font-bold">Manager</h1>
-            {/* Manager-specific UI elements */}
+            <h1 className="text-xl font-bold">Manager Profile</h1>
             <button onClick={handleRevokeManager} className="btn btn-warning">Revoke Venue Manager Status</button>
+            <Link to="/create-venue" className="btn btn-primary ml-4">Add New Venue</Link>
             <Link to="/" className="text-blue-500">Return to Home</Link>
         </div>
     );
 };
 
 export default ManagerProfilePage;
+
+

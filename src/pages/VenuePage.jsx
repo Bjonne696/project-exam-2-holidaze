@@ -1,4 +1,4 @@
-//src\pages\VenuePage.jsx:
+// project-exam-2-holidaze/src/pages/VenuePage.jsx
 
 import React, { useState, useEffect } from "react";
 import { useParams } from 'react-router-dom';

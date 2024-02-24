@@ -1,5 +1,6 @@
-import { create } from 'zustand';
+// project-exam-2-holidaze/src/stores/authStore.jsx
 
+import { create } from 'zustand';
 import { fetchRegisterUser, fetchLoginUser } from '../hooks/authService';
 
 const useAuthStore = create((set) => ({

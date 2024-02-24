@@ -1,3 +1,5 @@
+// project-exam-2-holidaze/src/hooks/fetchUserBookings.jsx
+
 import BASE_URL from "../constants/api.js";
 
 // Fetches user bookings
@@ -40,15 +42,14 @@ export const revokeVenueManagerStatus = async ({ token, name }) => {
     const response = await fetch(`${BASE_URL}/profiles/${name}`, {
         method: 'PUT',
         headers: {
-            Authorization: `Bearer ${token}`,
             'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify({ venueManager: false }),
     });
 
     if (!response.ok) {
-        const message = `An error has occurred: ${response.status}`;
-        throw new Error(message);
+        throw new Error(`An error has occurred: ${response.status}`);
     }
 
     return response.json();
