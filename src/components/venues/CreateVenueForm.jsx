@@ -3,18 +3,19 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useAuthStore from '../../stores/authStore';
-import { createVenue } from '../../hooks/venuesService';
+import useVenuesStore from '../../stores/venuesStore';
 
 const CreateVenueForm = () => {
   const navigate = useNavigate();
-  const { token } = useAuthStore((state) => ({ token: state.token }));
+  const { token } = useAuthStore((state) => state); // Correctly access the token
+  const { createVenue } = useVenuesStore(); // Access createVenue action correctly
   const [formData, setFormData] = useState({
     name: '',
     description: '',
-    media: [], // Consider how you'll collect multiple media links (e.g., as comma-separated in a text input or via multiple file inputs)
+    media: [],
     price: '',
     maxGuests: '',
-    rating: 0, // Optional
+    rating: 0,
     meta: {
       wifi: false,
       parking: false,
@@ -22,13 +23,13 @@ const CreateVenueForm = () => {
       pets: false,
     },
     location: {
-      address: '', // Optional, with defaults if not provided
-      city: '', // Optional
-      zip: '', // Optional
-      country: '', // Optional
-      continent: '', // Optional
-      lat: '', // Optional
-      lng: '', // Optional
+      address: '',
+      city: '',
+      zip: '',
+      country: '',
+      continent: '',
+      lat: '',
+      lng: '',
     },
   });
 
