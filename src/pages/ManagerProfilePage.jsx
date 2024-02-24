@@ -6,6 +6,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import useAuthStore from '../stores/authStore';
 import { revokeVenueManagerStatus } from '../hooks/fetchUserBookings';
 
+
 const ManagerProfilePage = () => {
     const navigate = useNavigate();
     const { token, user, setIsVenueManager } = useAuthStore();
