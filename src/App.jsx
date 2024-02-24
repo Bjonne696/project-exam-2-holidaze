@@ -1,3 +1,5 @@
+// project-exam-2-holidaze/src/App.jsx
+
 import { Routes, Route } from 'react-router-dom';
 import Layout from "./components/layout/Layout";
 import NotFound from "./components/layout/NotFound";
@@ -7,6 +9,8 @@ import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import ProfilePage from './pages/ProfilePage';
 import ManagerProfilePage from './pages/ManagerProfilePage';
+import CreateVenueForm from './components/venues/CreateVenueForm';
+
 
 function App() {
 	return (
@@ -17,6 +21,7 @@ function App() {
         		<Route path="/register" element={<RegisterPage />} />
 				<Route path="venue/:id" element={<VenuePage />} />
 				<Route path="/profile" element={<ProfilePage />} />
+				<Route path="/create-venue" element={<CreateVenueForm />} />
 				<Route path="manager-profile" element={<ManagerProfilePage />} />
 				<Route path="*" element={<NotFound />} />
 			</Route>

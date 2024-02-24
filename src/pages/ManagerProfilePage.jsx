@@ -1,3 +1,5 @@
+// project-exam-2-holidaze/src/pages/MangerProfilePage.jsx
+
 import React from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { Link, useNavigate } from 'react-router-dom';
@@ -27,9 +29,12 @@ const ManagerProfilePage = () => {
         <div className="container mx-auto">
             <h1 className="text-xl font-bold">Manager Profile</h1>
             <button onClick={handleRevokeManager} className="btn btn-warning">Revoke Venue Manager Status</button>
+            <Link to="/create-venue" className="btn btn-primary ml-4">Add New Venue</Link>
             <Link to="/" className="text-blue-500">Return to Home</Link>
         </div>
     );
 };
 
 export default ManagerProfilePage;
+
+

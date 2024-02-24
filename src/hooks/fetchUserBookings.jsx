@@ -1,3 +1,5 @@
+// project-exam-2-holidaze/src/hooks/fetchUserBookings.jsx
+
 import BASE_URL from "../constants/api.js";
 
 // Fetches user bookings

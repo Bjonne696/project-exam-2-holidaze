@@ -1,4 +1,4 @@
-//src\components\venues\VenueItem.jsx:
+// project-exam-2-hollidaze/src/components/venues/VenueItem.jsx
 
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';

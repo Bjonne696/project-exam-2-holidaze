@@ -1,3 +1,5 @@
+// project-exam-2-hollidaze/src/components/layout/Layout.jsx
+
 import React, { useEffect } from 'react';
 import { Button, Menu, Navbar } from "react-daisyui";
 import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
