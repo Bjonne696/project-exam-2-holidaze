@@ -22,3 +22,4 @@ export const fetchLoginUser = async (credentials) => {
   if (!response.ok) throw new Error('Failed to login');
   return response.json();
 };
+
