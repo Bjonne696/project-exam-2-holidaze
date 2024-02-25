@@ -3,12 +3,23 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { Card } from 'react-daisyui';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom'; // Ensure useNavigate is imported here
+import useAuthStore from '../../stores/authStore';
+import useVenuesStore from '../../stores/venuesStore';
 
-const VenueItem = ({ data, isDetailedView = false }) => {
+const VenueItem = ({ data, isDetailedView = false, showActions = false, onDeleteClick }) => {
   const { name, description, media, rating, maxGuests, price, created, updated, meta, location, owner, bookings } = data;
   const [imageError, setImageError] = useState(false);
   const imageSrc = media.length > 0 ? media[0] : null;
+  const navigate = useNavigate();
+  const { token } = useAuthStore((state) => state);
+  const { deleteVenue } = useVenuesStore();
+
+  const handleDelete = async () => {
+    await deleteVenue(data.id, token);
+    onDeleteClick && onDeleteClick();
+  };
+
 
   const imageContent = imageSrc && !imageError ? (
     <img src={imageSrc} alt={name} onError={() => setImageError(true)} className="h-52 w-full object-cover block rounded-t-lg" />
@@ -34,15 +45,31 @@ const VenueItem = ({ data, isDetailedView = false }) => {
     );
   }
 
-  // For the summary view
+  // Add buttons if showActions is true
   return (
     <Card className="flex flex-col min-h-[360px] w-[280px] overflow-hidden">
       {imageContent}
       <div className="p-4 flex-1">
         <h3 className="text-lg font-semibold">{name}</h3>
-        <div className="text-gray-800">{rating} ★</div>
-        <div className="mt-2"><span className="font-bold">Max Guests:</span> {maxGuests}</div>
-        <div className="mt-2"><span className="font-bold">Price:</span> ${price}</div>
+        <p className="mt-2"><span className="font-bold">Rating:</span> {rating} ★</p>
+          <p><span className="font-bold">Max Guests:</span> {maxGuests}</p>
+          <p><span className="font-bold">Price:</span> ${price}</p>
+        {showActions && (
+          <div className="flex justify-between mt-4">
+            <button
+              className="btn btn-primary"
+              onClick={() => navigate(`/update-venue/${data.id}`)}
+            >
+              Update
+            </button>
+            <button
+              className="btn btn-error"
+              onClick={handleDelete}
+            >
+              Delete
+            </button>
+          </div>
+        )}
       </div>
     </Card>
   );

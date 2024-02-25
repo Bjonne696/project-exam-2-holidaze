@@ -10,6 +10,8 @@ import RegisterPage from './pages/RegisterPage';
 import ProfilePage from './pages/ProfilePage';
 import ManagerProfilePage from './pages/ManagerProfilePage';
 import CreateVenueForm from './components/venues/CreateVenueForm';
+import UpdateVenueForm from './components/venues/UpdateVenueForm';
+
 
 
 function App() {
@@ -22,6 +24,7 @@ function App() {
 				<Route path="venue/:id" element={<VenuePage />} />
 				<Route path="/profile" element={<ProfilePage />} />
 				<Route path="/create-venue" element={<CreateVenueForm />} />
+				<Route path="/update-venue/:venueId" element={<UpdateVenueForm />} />
 				<Route path="manager-profile" element={<ManagerProfilePage />} />
 				<Route path="*" element={<NotFound />} />
 			</Route>
