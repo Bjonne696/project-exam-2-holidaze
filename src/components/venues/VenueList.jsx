@@ -1,4 +1,4 @@
-// Corrected VenueList.jsx
+// project-exam-2-holidaze/src/components/venues/VenueList.jsx
 import React, { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import VenueItem from './VenueItem';
