@@ -13,6 +13,7 @@ const useAuthStore = create((set) => ({
       if (data.accessToken) {
         set({ user: data, token: data.accessToken, error: null });
         localStorage.setItem('token', data.accessToken); // Persist token
+        console.log("Access Token after registration:", data.accessToken); // Log the token
       } else {
         set({ error: "Registration failed. Please check your input and try again." });
       }
@@ -27,6 +28,8 @@ const useAuthStore = create((set) => ({
       if (data.accessToken) {
         set({ user: data, token: data.accessToken, error: null });
         localStorage.setItem('token', data.accessToken); // Persist token
+        const decodedToken = decodeToken(data.accessToken);
+        console.log('Logged in user token data:', decodedToken);
       } else {
         set({ error: "Login failed. Please check your credentials and try again." });
       }
