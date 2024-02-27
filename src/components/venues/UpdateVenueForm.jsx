@@ -3,13 +3,13 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import useAuthStore from '../../stores/authStore';
-import useVenuesStore from '../../stores/venuesStore';
+import {  useUpdateVenue } from '../../hooks/useVenues';
 
 const UpdateVenueForm = () => {
   const { venueId } = useParams();
   const navigate = useNavigate();
   const { token } = useAuthStore((state) => state);
-  const { venues, fetchVenueById, updateVenue } = useVenuesStore();
+  const { venues, fetchVenueById, updateVenue } = useUpdateVenue();
 
   // Initialize formData state with fields expected in the form.
   const [formData, setFormData] = useState({

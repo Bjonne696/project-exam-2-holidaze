@@ -8,7 +8,7 @@ import authStore from '../stores/authStore';
 import 'react-datepicker/dist/react-datepicker.css';
 import { fetchAllBookings, createBooking } from '../hooks/bookings';
 import VenueItem from '../components/venues/VenueItem';
-import useVenueStore from '../stores/venuesStore';
+import { useFetchVenueById } from '../hooks/useVenues';
 
 function VenuePage() {
   const { id: venueId } = useParams(); // Use useParams to get the venueId from the URL
@@ -17,7 +17,7 @@ function VenuePage() {
   const [guests, setGuests] = useState(1); // Default to 1 guest
   const queryClient = useQueryClient();
   const { token } = authStore((state) => state);
-  const { venue, fetchVenueById } = useVenueStore(); // Destructure fetchVenueById from useVenueStore
+  const { venue, fetchVenueById } = useFetchVenueById(); // Destructure fetchVenueById from useVenueStore
 
   useEffect(() => {
     fetchVenueById(venueId);

@@ -3,12 +3,12 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useAuthStore from '../../stores/authStore';
-import useVenuesStore from '../../stores/venuesStore';
+import {  useCreateVenue } from '../../hooks/useVenues';
 
 const CreateVenueForm = () => {
   const navigate = useNavigate();
   const { token } = useAuthStore((state) => state); // Correctly access the token
-  const { createVenue } = useVenuesStore(); // Access createVenue action correctly
+  const { createVenue } = useCreateVenue(); // Access createVenue action correctly
   const [formData, setFormData] = useState({
     name: '',
     description: '',
