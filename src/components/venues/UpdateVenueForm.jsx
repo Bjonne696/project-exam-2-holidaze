@@ -31,6 +31,10 @@ const UpdateVenueForm = () => {
     }
   }, [venueId, venues, fetchVenueById, token]);
 
+  
+  
+  
+  
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     if (type === 'checkbox') {

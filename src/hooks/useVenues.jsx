@@ -58,16 +58,18 @@ async function createVenue(venueData, { token }) {
 
 
 // Function to update a venue
-async function updateVenue({ venueId, venueData }) {
+async function updateVenue(venueId, venueData, token) {
   const response = await fetch(`${BASE_URL}/venues/${venueId}`, {
     method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
+    },
     body: JSON.stringify(venueData),
   });
   if (!response.ok) throw new Error('Failed to update venue');
   return response.json();
 }
-
 // Function to delete a venue
 async function deleteVenue(venueId) {
   const response = await fetch(`${BASE_URL}/venues/${venueId}`, {
@@ -128,11 +130,13 @@ export function useCreateVenue() {
 // Custom hook for updating a venue
 export function useUpdateVenue() {
   const queryClient = useQueryClient();
+  const { token } = useAuthStore((state) => state);
+
   return useMutation({
-    mutationFn: updateVenue,
+    mutationFn: ({ venueId, venueData }) => updateVenue(venueId, venueData, token),
     onSuccess: () => {
       // Invalidate and refetch venues to reflect the update
-      queryClient.invalidateQueries({ queryKey: ['venues'] });
+      queryClient.invalidateQueries(['venues']);
     },
   });
 }
