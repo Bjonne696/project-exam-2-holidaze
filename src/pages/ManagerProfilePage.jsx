@@ -1,20 +1,23 @@
-import React, { useEffect } from 'react';
-import { useMutation } from '@tanstack/react-query';
+// project-exam-2-hollidaze/src/pages/ManagerProfilePage.jsx
+
+import React from 'react';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { Link, useNavigate } from 'react-router-dom';
 import useAuthStore from '../stores/authStore';
-import useVenuesStore from '../stores/venuesStore'; // Corrected import
+import { useFetchManagedVenues } from '../hooks/useVenues'; // Ensure correct path
 import { revokeVenueManagerStatus } from '../hooks/fetchUserBookings';
-import VenueItem from '../components/venues/VenueItem'; // Assuming you're using VenueItem component
+import VenueItem from '../components/venues/VenueItem';
 
 const ManagerProfilePage = () => {
     const navigate = useNavigate();
     const { user, token } = useAuthStore(state => state);
-    const { fetchManagedVenues, venues } = useVenuesStore();
+
+    // Adjusted to use the React Query hook correctly
+    const { data: venues, isLoading } = useFetchManagedVenues(user?.name, token);
 
     const mutation = useMutation({
         mutationFn: () => revokeVenueManagerStatus({ token, name: user?.name }),
         onSuccess: () => {
-
             navigate('/profile');
         },
         onError: (error) => {
@@ -26,11 +29,7 @@ const ManagerProfilePage = () => {
         mutation.mutate();
     };
 
-    useEffect(() => {
-        if (user && user.name && token) {
-          fetchManagedVenues(user.name, token);
-        }
-      }, [user, token, fetchManagedVenues]);
+    if (isLoading) return <div>Loading...</div>;
 
     return (
         <div className="container mx-auto">
@@ -39,14 +38,13 @@ const ManagerProfilePage = () => {
             <Link to="/create-venue" className="btn btn-primary ml-4">Add New Venue</Link>
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {venues.map((venue) => (
-            <VenueItem
-              key={venue.id}
-              data={venue}
-              showActions={true}
-              onDeleteClick={() => fetchManagedVenues(user.name, token)}
-            />
-            ))}
+                {venues?.map((venue) => (
+                    <VenueItem
+                        key={venue.id}
+                        data={venue}
+                        showActions={true}
+                    />
+                ))}
             </div>
 
             <Link to="/" className="text-blue-500">Return to Home</Link>

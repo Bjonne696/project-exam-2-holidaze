@@ -3,12 +3,13 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useAuthStore from '../../stores/authStore';
-import useVenuesStore from '../../stores/venuesStore';
+import {  useCreateVenue } from '../../hooks/useVenues';
 
 const CreateVenueForm = () => {
   const navigate = useNavigate();
-  const { token } = useAuthStore((state) => state); // Correctly access the token
-  const { createVenue } = useVenuesStore(); // Access createVenue action correctly
+  const { token } = useAuthStore((state) => state);
+  // Adjusted to correctly use the mutation object
+  const { mutate: createVenue } = useCreateVenue();
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -63,7 +64,7 @@ const CreateVenueForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     const payload = {
       ...formData,
       price: parseFloat(formData.price),
@@ -74,13 +75,18 @@ const CreateVenueForm = () => {
         lng: formData.location.lng ? parseFloat(formData.location.lng) : 0,
       },
     };
-
-
+  
     try {
-      await createVenue(payload, token);
-      navigate('/manager-profile'); // Adjust as necessary
+      await createVenue(payload, {
+        onSuccess: () => {
+          navigate('/manager-profile');
+        },
+        onError: (error) => {
+          console.error("Error creating venue:", error.message);
+        }
+      });
     } catch (error) {
-      console.error("Error creating venue:", error.message);
+      console.error("Error submitting the form:", error);
     }
   };
 

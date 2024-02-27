@@ -1,36 +1,17 @@
 // project-exam-2-holidaze/src/components/venues/VenueList.jsx
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import VenueItem from './VenueItem';
-import useVenuesStore from '../../stores/venuesStore'; // Ensure correct path
 import PropTypes from 'prop-types';
 
-const VenueList = () => {
-  const { fetchVenues, venues, isLoading } = useVenuesStore();
-  const loaderRef = useRef(null);
+// Update the component to accept props
+const VenueList = ({ venues, isLoading }) => {
+  // Remove the useFetchVenues hook and its related logic
 
-  useEffect(() => {
-    const observer = new IntersectionObserver((entries) => {
-      const first = entries[0];
-      if (first.isIntersecting) {
-        fetchVenues();
-      }
-    }, { threshold: 1 });
+  if (!venues) {
+    return <div>Loading venues...</div>; // Show a loading message or spinner
+  }
 
-    const currentLoader = loaderRef.current;
-    if (currentLoader) {
-      observer.observe(currentLoader);
-    }
-
-    // Return a cleanup function
-    return () => {
-      if (currentLoader) {
-        observer.unobserve(currentLoader);
-      }
-    };
-  }, [fetchVenues]);
-
-  // Render JSX outside of useEffect
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
       {venues.map(venue => (
@@ -40,7 +21,7 @@ const VenueList = () => {
           </Link>
         </div>
       ))}
-      <div ref={loaderRef} className="loading-ref">{isLoading && <p>Loading more venues...</p>}</div>
+      {isLoading && <div>Loading more venues...</div>}
     </div>
   );
 };
@@ -53,7 +34,8 @@ VenueList.propTypes = {
     rating: PropTypes.number,
     price: PropTypes.number,
     maxGuests: PropTypes.number,
-  })).isRequired,
+  })),
+  isLoading: PropTypes.bool // Optional, if you want to pass and handle loading state from HomePage
 };
 
 export default VenueList;
