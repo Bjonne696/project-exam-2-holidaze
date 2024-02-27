@@ -11,36 +11,13 @@ async function fetchVenues({ queryKey }) {
   return response.json();
 }
 
-// Create venue
-async function createVenue(venueData) {
-  const response = await fetch(`${BASE_URL}/venues`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(venueData),
-  });
-  if (!response.ok) throw new Error('Failed to create venue');
+// Function to fetch a venue by id
+const fetchVenueById = async ({ queryKey }) => {
+  const [_key, { id }] = queryKey;
+  const response = await fetch(`${BASE_URL}/venues/${id}`);
+  if (!response.ok) throw new Error('Failed to fetch venue');
   return response.json();
-}
-
-// Function to update a venue
-async function updateVenue({ venueId, venueData }) {
-  const response = await fetch(`${BASE_URL}/venues/${venueId}`, {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(venueData),
-  });
-  if (!response.ok) throw new Error('Failed to update venue');
-  return response.json();
-}
-
-// Function to delete a venue
-async function deleteVenue(venueId) {
-  const response = await fetch(`${BASE_URL}/venues/${venueId}`, {
-    method: 'DELETE',
-  });
-  if (!response.ok) throw new Error('Failed to delete venue');
-  return response.json(); // Or return true/false based on your API
-}
+};
 
 // Function to fetch managed venues
 async function fetchManagedVenues() {
@@ -64,66 +41,48 @@ async function fetchManagedVenues() {
   }
 }
 
-// Function to fetch a venue by id
-const fetchVenueById = async ({ queryKey }) => {
-  const [_key, { id }] = queryKey;
-  const response = await fetch(`${BASE_URL}/venues/${id}`);
-  if (!response.ok) throw new Error('Failed to fetch venue');
+// Function to Create venue
+async function createVenue(venueData, { token }) {
+  const response = await fetch(`${BASE_URL}/venues`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
+    },
+    body: JSON.stringify(venueData),
+  });
+  if (!response.ok) throw new Error('Failed to create venue');
   return response.json();
-};
+}
+
+
+
+// Function to update a venue
+async function updateVenue({ venueId, venueData }) {
+  const response = await fetch(`${BASE_URL}/venues/${venueId}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(venueData),
+  });
+  if (!response.ok) throw new Error('Failed to update venue');
+  return response.json();
+}
+
+// Function to delete a venue
+async function deleteVenue(venueId) {
+  const response = await fetch(`${BASE_URL}/venues/${venueId}`, {
+    method: 'DELETE',
+  });
+  if (!response.ok) throw new Error('Failed to delete venue');
+  return response.json(); // Or return true/false based on your API
+}
+
 
 // Custom hook for fetching venues
 export function useFetchVenues(limit = 100, offset = 0) {
   return useQuery({
     queryKey: ['venues', { limit, offset }],
     queryFn: fetchVenues,
-  });
-}
-
-// Custom hook for creating a venue
-export function useCreateVenue() {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: createVenue,
-    onSuccess: () => {
-      // Invalidate and refetch
-      queryClient.invalidateQueries({ queryKey: ['venues'] });
-    },
-  });
-}
-
-// Custom hook for updating a venue
-export function useUpdateVenue() {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: updateVenue,
-    onSuccess: () => {
-      // Invalidate and refetch venues to reflect the update
-      queryClient.invalidateQueries({ queryKey: ['venues'] });
-    },
-  });
-}
-
-// Custom hook for deleting a venue
-export function useDeleteVenue() {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: deleteVenue,
-    onSuccess: () => {
-      // Invalidate and refetch venues to reflect the deletion
-      queryClient.invalidateQueries({ queryKey: ['venues'] });
-    },
-  });
-}
-
-// Custom hook for fetching managed venues
-export function useFetchManagedVenues(profileName, token) {
-  return useQuery({
-    queryKey: ['managedVenues', { profileName, token }],
-    queryFn: fetchManagedVenues,
-    options: {
-      refetchOnWindowFocus: false,
-    },
   });
 }
 
@@ -138,3 +97,58 @@ export const useFetchVenueById = (id) => {
     },
   });
 };
+
+
+// Custom hook for fetching managed venues
+export function useFetchManagedVenues(profileName, token) {
+  return useQuery({
+    queryKey: ['managedVenues', { profileName, token }],
+    queryFn: fetchManagedVenues,
+    options: {
+      refetchOnWindowFocus: false,
+    },
+  });
+}
+
+
+// Custom hook for creating a venue
+export function useCreateVenue() {
+  const queryClient = useQueryClient();
+  const { token } = useAuthStore((state) => state);
+
+  return useMutation({
+    mutationFn: (venueData) => createVenue(venueData, { token }),
+    onSuccess: () => {
+      queryClient.invalidateQueries(['venues']);
+    },
+  });
+}
+
+
+// Custom hook for updating a venue
+export function useUpdateVenue() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: updateVenue,
+    onSuccess: () => {
+      // Invalidate and refetch venues to reflect the update
+      queryClient.invalidateQueries({ queryKey: ['venues'] });
+    },
+  });
+}
+
+
+// Custom hook for deleting a venue
+export function useDeleteVenue() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: deleteVenue,
+    onSuccess: () => {
+      // Invalidate and refetch venues to reflect the deletion
+      queryClient.invalidateQueries({ queryKey: ['venues'] });
+    },
+  });
+}
+
+
+
