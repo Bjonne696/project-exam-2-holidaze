@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 import { Card } from 'react-daisyui';
 import { Link, useNavigate } from 'react-router-dom'; // Ensure useNavigate is imported here
 import useAuthStore from '../../stores/authStore';
-import { useDeleteVenue } from '../../hooks/useVenues';
+import useVenuesStore from '../../stores/venuesStore';
 
 const VenueItem = ({ data, isDetailedView = false, showActions = false, onDeleteClick }) => {
   const { name, description, media, rating, maxGuests, price, created, updated, meta, location, owner, bookings } = data;
@@ -13,7 +13,7 @@ const VenueItem = ({ data, isDetailedView = false, showActions = false, onDelete
   const imageSrc = media.length > 0 ? media[0] : null;
   const navigate = useNavigate();
   const { token } = useAuthStore((state) => state);
-  const { deleteVenue } = useDeleteVenue();
+  const { deleteVenue } = useVenuesStore();
 
   const handleDelete = async () => {
     await deleteVenue(data.id, token);
