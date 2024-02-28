@@ -8,11 +8,13 @@ import VenueFilter from "../components/venues/VenueFilter";
 
 
 const HomePage = () => {
-	const { venues, isLoading, error, fetchVenues } = useVenuesStore();
+	const { venues, isLoading, error, fetchVenues, resetVenues } = useVenuesStore();
   
 	useEffect(() => {
+	  resetVenues(); // Reset the state before fetching
 	  fetchVenues();
-	}, [fetchVenues]);
+	  // Ensure fetchVenues and resetVenues are included in the dependency array if they are wrapped in useCallback or might change
+	}, [fetchVenues, resetVenues]);
   
 	if (isLoading) return <div>Loading...</div>;
 	if (error) return <div>Error: {error.message}</div>;
