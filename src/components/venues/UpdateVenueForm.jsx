@@ -3,13 +3,13 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import useAuthStore from '../../stores/authStore';
-import {  useUpdateVenue } from '../../hooks/useVenues';
+import useVenuesStore from '../../stores/venuesStore';
 
 const UpdateVenueForm = () => {
   const { venueId } = useParams();
   const navigate = useNavigate();
   const { token } = useAuthStore((state) => state);
-  const { venues, fetchVenueById, updateVenue } = useUpdateVenue();
+  const { venues, fetchVenueById, updateVenue } = useVenuesStore();
 
   // Initialize formData state with fields expected in the form.
   const [formData, setFormData] = useState({
@@ -31,10 +31,6 @@ const UpdateVenueForm = () => {
     }
   }, [venueId, venues, fetchVenueById, token]);
 
-  
-  
-  
-  
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     if (type === 'checkbox') {
@@ -58,9 +54,9 @@ const UpdateVenueForm = () => {
   };
 
   return (
-    <div className="container mx-auto my-8">
-      <h2 className="text-xl font-bold mb-4">Update Venue</h2>
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <div className="container mx-auto my-8">
+        <h2 className="text-xl font-bold mb-4">Update Venue</h2>
+        <form onSubmit={handleSubmit} className="space-y-4">
         {/* Venue Name */}
         <div>
           <label htmlFor="name" className="block text-sm font-medium text-gray-700">Venue Name:</label>
@@ -112,7 +108,8 @@ const UpdateVenueForm = () => {
             className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm"
           />
         </div>
-        {/* Convert media array back to string for the input field */}
+        {/* Media URLs */}
+        {/* Assuming media is an array of strings */}
         <div>
           <label htmlFor="media" className="block text-sm font-medium text-gray-700">Media URLs:</label>
           <input
@@ -125,6 +122,7 @@ const UpdateVenueForm = () => {
             placeholder="Enter URLs separated by commas"
           />
         </div>
+        {/* Submit Button */}
         <button type="submit" className="btn btn-primary">Update Venue</button>
       </form>
     </div>

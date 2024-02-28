@@ -13,7 +13,6 @@ import CreateVenueForm from './components/venues/CreateVenueForm';
 import UpdateVenueForm from './components/venues/UpdateVenueForm';
 
 
-
 function App() {
 	return (
 		<Routes>
@@ -24,8 +23,8 @@ function App() {
 				<Route path="venue/:id" element={<VenuePage />} />
 				<Route path="/profile" element={<ProfilePage />} />
 				<Route path="/create-venue" element={<CreateVenueForm />} />
-				<Route path="/update-venue/:venueId" element={<UpdateVenueForm />} />
 				<Route path="manager-profile" element={<ManagerProfilePage />} />
+				<Route path="/update-venue/:venueId" element={<UpdateVenueForm />} />
 				<Route path="*" element={<NotFound />} />
 			</Route>
 		</Routes>
