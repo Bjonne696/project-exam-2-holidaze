@@ -1,8 +1,7 @@
 // project-exam-2-holidaze/src/stores/venuesStore.jsx
 
 import { create } from 'zustand';
-import BASE_URL from '.././constants/api';
-
+import BASE_URL from '../constants/api';
 
 const useVenuesStore = create((set, get) => ({
   venues: [],
@@ -12,27 +11,55 @@ const useVenuesStore = create((set, get) => ({
   limit: 100, // Assuming 100 venues per fetch is reasonable
   offset: 0, // Start from the beginning
 
-  fetchVenues: async (increment = true) => {
+  resetVenues: () => {
+    set({
+      venues: [],
+      offset: 0,
+      isLoading: false,
+      error: null,
+    });
+  },
+
+  fetchVenues: async () => {
     set({ isLoading: true });
-    const { offset, limit } = get(); // Destructure for current state
-    try {
-      const response = await fetch(`${BASE_URL}/venues?limit=${limit}&offset=${offset}`);
-      if (!response.ok) throw new Error('Failed to fetch venues');
-      let newData = await response.json();
-      // Deduplicate newData based on venue ID
-      const seenIds = new Set(get().venues.map(venue => venue.id));
-      newData = newData.filter(venue => {
-        return seenIds.has(venue.id) ? false : seenIds.add(venue.id);
-      });
-      
-      console.log("Venues fetched successfully:", newData); // Log the fetched data
-      set((state) => ({
-        venues: increment ? [...state.venues, ...newData] : newData,
-        offset: state.offset + newData.length, // Update offset based on fetched data length
-        isLoading: false,
-      }));
-    } catch (error) {
-      set((state) => ({ error: error.message, isLoading: false }));
+    let allDataFetched = false;
+
+    // Reset the state before fetching new data
+    get().resetVenues();
+
+    const fetchBatch = async () => {
+      const { offset, limit } = get(); // Get current state
+      try {
+        const response = await fetch(`${BASE_URL}/venues?limit=${limit}&offset=${offset}`);
+        if (!response.ok) throw new Error('Failed to fetch venues');
+        const newData = await response.json();
+
+        if (newData.length === 0) {
+          allDataFetched = true; // No more data to fetch
+          return;
+        }
+
+        // Deduplicate newData based on venue ID
+        const seenIds = new Set(get().venues.map(venue => venue.id));
+        const uniqueData = newData.filter(venue => !seenIds.has(venue.id));
+
+        set((state) => ({
+          venues: [...state.venues, ...uniqueData],
+          offset: state.offset + uniqueData.length,
+          isLoading: false,
+        }));
+
+        if (uniqueData.length < limit) {
+          allDataFetched = true; // Less data than limit indicates no more data to fetch
+        }
+      } catch (error) {
+        set({ error: error.message, isLoading: false });
+        allDataFetched = true; // Stop fetching on error
+      }
+    };
+
+    while (!allDataFetched) {
+      await fetchBatch(); // Fetch until all data is retrieved or an empty array is returned
     }
   },
   
