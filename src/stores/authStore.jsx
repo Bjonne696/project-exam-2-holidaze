@@ -2,9 +2,10 @@
 
 import { create } from 'zustand';
 import { fetchRegisterUser, fetchLoginUser } from '../hooks/authService';
+import BASE_URL from '../constants/api';
 
 
-const useAuthStore = create((set) => ({
+const useAuthStore = create((set, get) => ({
   token: null,
   user: null,
   error: null,
@@ -48,65 +49,62 @@ const useAuthStore = create((set) => ({
   
   setIsVenueManager: (isManager) => {
     set((state) => ({
-      user: { ...state.user, venueManager: isManager }
+        user: { ...state.user, venueManager: isManager },
     }));
-    // Optionally, update localStorage or session state if necessary
-    const updatedUser = { ...state.user, venueManager: isManager };
-    localStorage.setItem('user', JSON.stringify(updatedUser)); // Assuming you want to persist this in local storage
-  },
+},
 
 
-  becomeVenueManager: async ({ name }) => {
-    const { token } = get(); // Retrieve token from the store's state
-    try {
-      const response = await fetch(`${BASE_URL}/profiles/${name}`, { // Correct API endpoint
-        method: 'PUT', // Correct method from the provided hook
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`, // Correctly pass the token
-        },
-        body: JSON.stringify({ venueManager: true }), // Correctly set the venueManager property to true
-      });
+becomeVenueManager: async ({ name }) => {
+  const { token } = get();
+  try {
+    const response = await fetch(`${BASE_URL}/profiles/${name}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify({ venueManager: true }),
+    });
 
-      if (!response.ok) {
-        const error = `An error has occurred: ${response.status}`;
-        throw new Error(error);
-      }
-
-      const updatedUser = await response.json(); // Assuming the response includes updated user data
-      set({ user: updatedUser }); // Update user state with the new data
-    } catch (error) {
-      console.error("Error becoming venue manager:", error);
-      set({ error: error.toString() });
+    if (!response.ok) {
+      const error = `An error has occurred: ${response.status}`;
+      throw new Error(error);
     }
-  },
+
+    const updatedUser = await response.json();
+    set({ user: { ...get().user, ...updatedUser } });
+  } catch (error) {
+    console.error("Error becoming venue manager:", error);
+    set({ error: error.toString() });
+  }
+},
 
 
-  revokeVenueManagerStatus: async ({ name }) => {
-    const { token } = get(); // Retrieve token from the store's state
-    try {
-      const response = await fetch(`${BASE_URL}/profiles/${name}`, { // Correct API endpoint
-        method: 'PUT', // Use the PUT method as per the hook
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`, // Correctly pass the token
-        },
-        body: JSON.stringify({ venueManager: false }), // Correctly set the venueManager property to false
-      });
+revokeVenueManagerStatus: async ({ name }) => {
+  // Accessing the token using get()
+  const token = get().token;
+  try {
+    const response = await fetch(`${BASE_URL}/profiles/${name}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify({ venueManager: false }),
+    });
 
-      if (!response.ok) {
-        const error = `An error has occurred: ${response.status}`;
-        throw new Error(error);
-      }
-
-      const updatedUser = await response.json(); // Assuming the response includes updated user data
-      set({ user: updatedUser }); // Update user state with the new data
-    } catch (error) {
-      console.error("Error revoking venue manager status:", error);
-      set({ error: error.toString() });
+    if (!response.ok) {
+      throw new Error(`An error has occurred: ${response.status}`);
     }
-  },
 
+    const updatedUser = await response.json();
+    // Here we are directly using set() which is also provided by Zustand
+    set({ user: updatedUser });
+  } catch (error) {
+    console.error("Error revoking venue manager status:", error);
+    set({ error: error.toString() });
+  }
+},
 
   // Add more actions and state as needed
 

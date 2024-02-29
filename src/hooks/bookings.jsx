@@ -24,24 +24,6 @@ export const fetchBookingsForVenue = async (venueId, token) => {
 };
 
 
-// Fetch all bookings for the currently authenticated user
-export const fetchUserBookings = async (token, name) => {
-  try {
-    const response = await fetch(`${BASE_URL}/holidaze/profiles/${name}/bookings`, {
-      headers: {
-        'Accept': 'application/json',
-        'Authorization': `Bearer ${token}`,
-      },
-    });
-    if (!response.ok) {
-      throw new Error(`Network response was not ok: ${response.statusText}`);
-    }
-    return await response.json();
-  } catch (error) {
-    console.error("There was a problem fetching the user's bookings linked to the profile:", error);
-    throw error;
-  }
-};
 
 // Function to create a new booking with the necessary details including the _customer and _venue query parameters
 export const createBooking = async (bookingData, token) => {
@@ -84,22 +66,6 @@ export const updateBooking = async ({ id, updateData, token }) => {
 };
 
 
-// Function to delete a booking
-export const deleteBooking = async ({ id, token }) => {
-  const response = await fetch(`${BASE_URL}/bookings/${id}`, {
-      method: 'DELETE',
-      headers: {
-          'Authorization': `Bearer ${token}`,
-      },
-  });
-
-  if (!response.ok) {
-      throw new Error(`An error has occurred: ${response.status}`);
-  }
-
-  // Response might be empty for a DELETE operation, adjust as needed
-  return true;
-};
 
 // Function to enable a user to become a venue manager
 export const becomeVenueManager = async ({ token, name }) => {

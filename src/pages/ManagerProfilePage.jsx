@@ -15,8 +15,9 @@ function ManagerProfilePage() {
     const handleRevokeManager = async () => {
         if (user?.name) {
             try {
-                await revokeVenueManagerStatus(token, user.name);
+                await revokeVenueManagerStatus({ name: user.name }); // Corrected function call
                 setIsVenueManager(false); // Update venue manager status in Zustand store
+                console.log("Venue manager status revoked.");
                 navigate('/profile'); // Navigate to profile page upon success
             } catch (error) {
                 console.error('Error revoking manager status:', error);
