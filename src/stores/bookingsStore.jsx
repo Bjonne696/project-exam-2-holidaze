@@ -85,7 +85,13 @@ const useBookingsStore = create((set, get) => ({
   },
 
   deleteBooking: async (bookingId) => {
-    const { token } = get();
+    let { token } = get();
+    // Fallback to localStorage if token is undefined in the store
+    if (!token) {
+      token = localStorage.getItem('token');
+    }
+    console.log(`Token being used: Bearer ${token}`); // Verify token
+  
     try {
       const response = await fetch(`${BASE_URL}/bookings/${bookingId}`, {
         method: 'DELETE',
@@ -94,12 +100,13 @@ const useBookingsStore = create((set, get) => ({
         },
       });
       if (!response.ok) throw new Error('Failed to delete booking');
-      // Optionally refresh bookings after deletion
-      get().fetchUserBookings();
+      // Refresh bookings after deletion...
     } catch (error) {
+      console.error('Error deleting booking:', error);
       set({ error: error.message });
     }
   },
+
 }));
 
 export default useBookingsStore;
