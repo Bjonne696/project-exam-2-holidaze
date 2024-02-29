@@ -5,15 +5,18 @@ import useAuthStore from '../stores/authStore';
 import useBookingsStore from '../stores/bookingsStore';
 
 function ProfilePage() {
-    const { user, token } = useAuthStore();
+    const { user, token } = useAuthStore((state) => ({
+        user: state.user,
+        token: state.token,
+    }));
     const { bookings, fetchUserBookings, isLoading, error } = useBookingsStore();
 
     useEffect(() => {
-        // Ensure both user and token are available before fetching
+        // Make sure user and token are available
         if (token && user?.name) {
-            fetchUserBookings();
+            fetchUserBookings(user.name, token); // Pass user name and token explicitly if needed
         }
-    }, [token, user?.name, fetchUserBookings]);
+    }, [user?.name, token]);
 
     if (isLoading) return <div>Loading bookings...</div>;
     if (error) return <div>Error: {error}</div>;

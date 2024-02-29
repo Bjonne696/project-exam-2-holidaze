@@ -44,6 +44,8 @@ const useAuthStore = create((set) => ({
     localStorage.removeItem('token');
     console.log("Logged out successfully");
   },
+
+  
   setIsVenueManager: (isManager) => {
     set((state) => ({
       user: { ...state.user, venueManager: isManager }

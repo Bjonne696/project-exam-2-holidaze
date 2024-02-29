@@ -26,29 +26,26 @@ const useBookingsStore = create((set, get) => ({
     }
   },
 
-  fetchUserBookings: async () => {
-    const { token, user } = get(); // Ensure you have user state in this store or integrate with authStore
-    if (!user?.name || !token) {
-      console.error("Missing user information or token.");
-      return;
-    }
+  fetchUserBookings: async (userName, authToken, data) => {
     set({ isLoading: true });
     try {
-      const response = await fetch(`${BASE_URL}/profiles/${user.name}/bookings`, {
+      const response = await fetch(`${BASE_URL}/profiles/${userName}/bookings`, {
         headers: {
-          'Authorization': `Bearer ${token}`,
+
+          'Authorization': `Bearer ${authToken}`,
         },
       });
       if (!response.ok) {
-        throw new Error('Failed to fetch user bookings');
+        const errorMsg = await response.json();
+        throw new Error(errorMsg);
       }
       const bookings = await response.json();
       set({ bookings, isLoading: false });
     } catch (error) {
       set({ error: error.message, isLoading: false });
     }
-  },
-  
+},
+
   createBooking: async (bookingData) => {
     const { token } = get();
     try {
