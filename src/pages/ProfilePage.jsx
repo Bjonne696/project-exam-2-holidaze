@@ -1,56 +1,46 @@
-// project-exam-2-holidaze/src/pages/ProfilePage.jsx
+//project-exam-2-holidaze/src/pages/ProfilePage.jsx
 
-import React from "react";
-import { useQuery, useMutation } from '@tanstack/react-query';
-import { fetchUserBookings, becomeVenueManager } from '../hooks/fetchUserBookings';
+import React, { useEffect } from 'react';
 import useAuthStore from '../stores/authStore';
-import { useNavigate } from 'react-router-dom';
+import useBookingsStore from '../stores/bookingsStore';
 
 function ProfilePage() {
-    const { token, user, setIsVenueManager } = useAuthStore(state => ({
-        token: state.token,
+    const { user, token } = useAuthStore((state) => ({
         user: state.user,
-        setIsVenueManager: state.setIsVenueManager,
+        token: state.token,
     }));
-    const navigate = useNavigate();
+    const { bookings, fetchUserBookings, isLoading, error } = useBookingsStore();
 
-    // Updated useQuery call for React Query v5
-    const { data: bookings, error, isLoading } = useQuery({
-        queryKey: ['bookings'],
-        queryFn: () => fetchUserBookings(token),
-        enabled: !!token,
-    });
+    useEffect(() => {
+        // Make sure user and token are available
+        if (token && user?.name) {
+            fetchUserBookings(user.name, token); // Pass user name and token explicitly if needed
+        }
+    }, [user?.name, token]);
 
-    // Updated useMutation call for React Query v5
-    const mutation = useMutation({
-        mutationFn: () => becomeVenueManager({ token, name: user?.name }),
-        onSuccess: () => {
-            setIsVenueManager(true);
-            navigate('/manager-profile');
-        },
-    });
-
-    const handleBecomeManager = () => {
-        mutation.mutate();
-    };
-
-    if (isLoading) return <div>Loading...</div>;
-    if (error) return <div>Error: {error.message}</div>;
+    if (isLoading) return <div>Loading bookings...</div>;
+    if (error) return <div>Error: {error}</div>;
 
     return (
-        <div>
-            {bookings && bookings.length > 0 ? (
+        <div className="container mx-auto">
+            <h1 className="text-xl font-bold">Profile Page</h1>
+            {/* Display user info */}
+            <div>Name: {user?.name}</div>
+            <div>Email: {user?.email}</div>
+
+            {/* List bookings */}
+            <h2 className="text-lg font-bold mt-4">Your Bookings</h2>
+            {bookings.length > 0 ? (
                 bookings.map((booking) => (
                     <div key={booking.id}>
-                        <p>Date From: {new Date(booking.dateFrom).toLocaleDateString()}</p>
-                        <p>Date To: {new Date(booking.dateTo).toLocaleDateString()}</p>
-                        {/* Additional booking details can be displayed here */}
+                        {/* Display booking details */}
                     </div>
                 ))
             ) : (
-                <p>No bookings found.</p>
+                <p>You have no bookings.</p>
             )}
-            <button onClick={handleBecomeManager} className="btn btn-primary">Become Venue Manager</button>
+
+
         </div>
     );
 }

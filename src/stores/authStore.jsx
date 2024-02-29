@@ -3,6 +3,7 @@
 import { create } from 'zustand';
 import { fetchRegisterUser, fetchLoginUser } from '../hooks/authService';
 
+
 const useAuthStore = create((set) => ({
   token: null,
   user: null,
@@ -43,6 +44,8 @@ const useAuthStore = create((set) => ({
     localStorage.removeItem('token');
     console.log("Logged out successfully");
   },
+
+  
   setIsVenueManager: (isManager) => {
     set((state) => ({
       user: { ...state.user, venueManager: isManager }
@@ -51,6 +54,62 @@ const useAuthStore = create((set) => ({
     const updatedUser = { ...state.user, venueManager: isManager };
     localStorage.setItem('user', JSON.stringify(updatedUser)); // Assuming you want to persist this in local storage
   },
+
+
+  becomeVenueManager: async ({ name }) => {
+    const { token } = get(); // Retrieve token from the store's state
+    try {
+      const response = await fetch(`${BASE_URL}/profiles/${name}`, { // Correct API endpoint
+        method: 'PUT', // Correct method from the provided hook
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`, // Correctly pass the token
+        },
+        body: JSON.stringify({ venueManager: true }), // Correctly set the venueManager property to true
+      });
+
+      if (!response.ok) {
+        const error = `An error has occurred: ${response.status}`;
+        throw new Error(error);
+      }
+
+      const updatedUser = await response.json(); // Assuming the response includes updated user data
+      set({ user: updatedUser }); // Update user state with the new data
+    } catch (error) {
+      console.error("Error becoming venue manager:", error);
+      set({ error: error.toString() });
+    }
+  },
+
+
+  revokeVenueManagerStatus: async ({ name }) => {
+    const { token } = get(); // Retrieve token from the store's state
+    try {
+      const response = await fetch(`${BASE_URL}/profiles/${name}`, { // Correct API endpoint
+        method: 'PUT', // Use the PUT method as per the hook
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`, // Correctly pass the token
+        },
+        body: JSON.stringify({ venueManager: false }), // Correctly set the venueManager property to false
+      });
+
+      if (!response.ok) {
+        const error = `An error has occurred: ${response.status}`;
+        throw new Error(error);
+      }
+
+      const updatedUser = await response.json(); // Assuming the response includes updated user data
+      set({ user: updatedUser }); // Update user state with the new data
+    } catch (error) {
+      console.error("Error revoking venue manager status:", error);
+      set({ error: error.toString() });
+    }
+  },
+
+
+  // Add more actions and state as needed
+
 }));
 
 export const isAuthenticated = () => !!localStorage.getItem('token');
