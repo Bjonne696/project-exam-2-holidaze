@@ -1,4 +1,5 @@
 //project-exam-2-holidaze/src/pages/ProfilePage.jsx
+
 import React, { useEffect } from 'react';
 import useAuthStore from '../stores/authStore';
 import useBookingsStore from '../stores/bookingsStore';
@@ -9,9 +10,11 @@ const formatDate = (dateString) => {
 };
 
 function ProfilePage() {
-    const { user, token } = useAuthStore((state) => ({
+    const { user, token, becomeVenueManager, isVenueManager } = useAuthStore((state) => ({
         user: state.user,
         token: state.token,
+        becomeVenueManager: state.becomeVenueManager,
+        isVenueManager: state.user?.venueManager,
     }));
     const { bookings, fetchUserBookings, deleteBooking, isLoading, error } = useBookingsStore((state) => ({
         bookings: state.bookings,
@@ -26,6 +29,11 @@ function ProfilePage() {
             fetchUserBookings(user.name, token);
         }
     }, [user?.name, token, fetchUserBookings]); // fetchUserBookings added as a dependency
+
+    const handleBecomeVenueManager = async () => {
+        await becomeVenueManager({ name: user.name });
+        console.log('You are now a venue manager'); // Log success message or handle UI feedback
+    };
 
     // Handler for deleting bookings and refreshing the list
     const handleDeleteBooking = async (bookingId) => {
@@ -45,6 +53,16 @@ function ProfilePage() {
             <h1 className="text-xl font-bold">Profile Page</h1>
             <div>Name: {user?.name}</div>
             <div>Email: {user?.email}</div>
+
+            {!isVenueManager && (
+                <button
+                    onClick={handleBecomeVenueManager}
+                    className="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                >
+                    Become Venue Manager
+                </button>
+            )}
+
 
             <h2 className="text-lg font-bold mt-4">Your Bookings</h2>
             {bookings.length > 0 ? (

@@ -6,11 +6,10 @@ import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
 import useAuthStore from '../../stores/authStore'; // Adjusted import
 
 function Layout() {
-  const { logoutUser, token, user, setIsVenueManager } = useAuthStore(state => ({
+  const { logoutUser, token, user } = useAuthStore(state => ({
     logoutUser: state.logoutUser,
     token: state.token,
     user: state.user, // Accessing the user object from the store
-    setIsVenueManager: state.setIsVenueManager,
   }));
   const navigate = useNavigate();
 
@@ -22,12 +21,6 @@ function Layout() {
     console.log(`Logged in: ${isAuthenticated}`);
     console.log(`Venue Manager: ${isVenueManager}`);
   }, [isAuthenticated, isVenueManager]); // Dependency array includes both states
-
-  const handleRevokeManager = () => {
-    // Here you would call an API to revoke the manager status or directly update the state
-    setIsVenueManager(false);
-    navigate('/profile'); // Redirect the user to their profile page after revoking manager status
-  };
 
   return (
     <>
@@ -57,11 +50,6 @@ function Layout() {
                 <Menu.Item>
                   <NavLink to="/profile">Profile</NavLink>
                 </Menu.Item>
-                {isVenueManager && (
-                  <Menu.Item>
-                    <button onClick={handleRevokeManager} className="btn btn-warning">Revoke Manager</button>
-                  </Menu.Item>
-                )}
               </>
             ) : (
               <>
