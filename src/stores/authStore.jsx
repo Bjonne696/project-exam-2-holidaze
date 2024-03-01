@@ -4,14 +4,13 @@ import { create } from 'zustand';
 
 const useAuthStore = create((set) => ({
   token: localStorage.getItem('token') || null,
-  // Use a try-catch block to safely attempt to parse the 'user' item
   user: (() => {
     try {
       const user = localStorage.getItem('user');
-      return user ? JSON.parse(user) : null;
+      return user ? JSON.parse(user) : null; // Ensure null is returned if user is undefined
     } catch (e) {
       console.error('Error parsing user from localStorage:', e);
-      return null;
+      return null; // Return null in case of any error
     }
   })(),
 
@@ -30,13 +29,14 @@ const useAuthStore = create((set) => ({
     }
   },
   setError: (error) => set({ error }),
-
   logoutUser: () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     set({ user: null, token: null });
   },
 }));
+
+
 
 
 // Utility functions

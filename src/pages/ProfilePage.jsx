@@ -11,30 +11,31 @@ const formatDate = (dateString) => {
 };
 
 function ProfilePage() {
-  const { user, token, logoutUser } = useAuthStore((state) => ({
+  const { user, token, logoutUser, setUser } = useAuthStore((state) => ({
     user: state.user,
     token: state.token,
     logoutUser: state.logoutUser,
+    setUser: state.setUser, // Ensure you have a setUser method to update user state
   }));
   const { data: bookings, isLoading: isLoadingBookings, error: bookingsError } = useFetchUserBookings({ userName: user?.name, token });
   const { mutate: deleteBooking } = useDeleteBooking();
-  const { mutate: becomeVenueManager, isSuccess: becomeManagerSuccess } = useBecomeVenueManager();
-  const { mutate: revokeManagerStatus } = useRevokeVenueManagerStatus();
+  const { mutate: becomeVenueManager, isError: isBecomeManagerError, error: becomeManagerError } = useBecomeVenueManager();
+  const { mutate: revokeManagerStatus, isError: isRevokeManagerError, error: revokeManagerError } = useRevokeVenueManagerStatus();
 
   const handleBecomeVenueManagerClick = () => {
     becomeVenueManager({}, {
-      onSuccess: () => {
+      onSuccess: (updatedUser) => {
         console.log('You are now a venue manager');
-        // Optionally, refresh user data or UI state here
+        setUser(updatedUser); // Update user state to reflect the new venue manager status
       },
     });
   };
 
   const handleRevokeManagerStatusClick = () => {
     revokeManagerStatus({}, {
-      onSuccess: () => {
+      onSuccess: (updatedUser) => {
         console.log('Venue manager status revoked.');
-        // Optionally, refresh user data or UI state here
+        setUser(updatedUser); // Update user state to reflect the revocation of venue manager status
       },
     });
   };
@@ -47,6 +48,10 @@ function ProfilePage() {
       <h1 className="text-xl font-bold">Profile Page</h1>
       <div>Name: {user?.name}</div>
       <div>Email: {user?.email}</div>
+
+      {/* Error handling for becoming/rejecting venue manager */}
+      {isBecomeManagerError && <p className="text-red-500">Error: {becomeManagerError.message}</p>}
+      {isRevokeManagerError && <p className="text-red-500">Error: {revokeManagerError.message}</p>}
 
       {!user?.venueManager && (
         <button

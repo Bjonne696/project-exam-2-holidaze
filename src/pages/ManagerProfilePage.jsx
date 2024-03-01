@@ -18,6 +18,7 @@ function ManagerProfilePage() {
         revokeManagerStatus({ name: user.name }, {
             onSuccess: () => {
                 console.log("Venue manager status revoked.");
+                // Update the user state if needed, e.g., setUser(updatedUser);
                 navigate('/profile'); // Navigate to profile page upon success
             },
             onError: (error) => {

@@ -1,26 +1,30 @@
 // project-exam-2-hollidaze/src/hooks/useAuthHooks.jsx
-
-import useAuthStore from '../stores/authStore'; // Adjust the import path as necessary
+import useAuthStore from '../stores/authStore';
 import BASE_URL from '../constants/api';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 const updateAuthState = (data, queryClient) => {
   if (data.accessToken) {
     localStorage.setItem('token', data.accessToken);
-    localStorage.setItem('user', JSON.stringify(data.user));
-    useAuthStore.setState({ user: data.user, token: data.accessToken });
-    queryClient.setQueryData(['auth', 'user'], data.user);
+    localStorage.setItem('user', JSON.stringify({
+      name: data.name,
+      email: data.email,
+      avatar: data.avatar,
+      venueManager: data.venueManager,
+    }));
+    useAuthStore.setState({ 
+      user: {
+        name: data.name,
+        email: data.email,
+        avatar: data.avatar,
+        venueManager: data.venueManager,
+      }, 
+      token: data.accessToken 
+    });
+    queryClient.setQueryData(['auth', 'user'], data);
     queryClient.setQueryData(['auth', 'token'], data.accessToken);
   }
 };
-
-const handleLoginSuccess = (response) => {
-  const { accessToken, ...userData } = response;
-  useAuthStore.getState().setToken(accessToken);
-  useAuthStore.getState().setUser(userData);
-  console.log("Logged in user data:", userData);
-};
-
 
 export const useRegisterUser = () => {
   const queryClient = useQueryClient();
@@ -35,6 +39,10 @@ export const useRegisterUser = () => {
       return response.json();
     },
     onSuccess: (data) => updateAuthState(data, queryClient),
+    onError: (error) => {
+      console.error("Registration error:", error);
+      useAuthStore.getState().setError(error.message || 'Failed to register');
+    },
   });
 };
 
@@ -51,6 +59,10 @@ export const useLoginUser = () => {
       return response.json();
     },
     onSuccess: (data) => updateAuthState(data, queryClient),
+    onError: (error) => {
+      console.error("Login error:", error);
+      useAuthStore.getState().setError(error.message || 'Failed to login');
+    },
   });
 };
 
@@ -83,18 +95,19 @@ export const becomeVenueManager = async (token) => {
 
 // hooks
 
-  export const useLogoutUser = () => {
-    const queryClient = useQueryClient();
-    return {
-      logout: () => {
-        localStorage.removeItem('token');
-        queryClient.setQueryData(['auth', 'user'], null);
-        queryClient.setQueryData(['auth', 'token'], null);
-        // Optionally, clear all queries from the cache
-        queryClient.clear();
-      }
-    };
+export const useLogoutUser = () => {
+  const queryClient = useQueryClient();
+  return {
+    logout: () => {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      useAuthStore.setState({ user: null, token: null });
+      queryClient.removeQueries(['auth', 'user']);
+      queryClient.removeQueries(['auth', 'token']);
+    }
   };
+};
+
   
   export const useBecomeVenueManager = () => {
     const queryClient = useQueryClient();
