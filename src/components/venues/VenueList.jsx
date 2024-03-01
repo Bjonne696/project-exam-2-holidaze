@@ -3,14 +3,11 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import VenueItem from './VenueItem';
-import { useFetchVenues } from '../../hooks/useVenuesApi'; // Adjust the import to your file structure
 import PropTypes from 'prop-types';
+import useVenuesStore from '../../stores/venuesStore';
 
 const VenueList = () => {
-  const { data: venues, isLoading, isError, error } = useFetchVenues();
-
-  if (isLoading) return <div>Loading...</div>;
-  if (isError) return <div>Error: {error.message}</div>;
+  const venues = useVenuesStore(state => state.venues);
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">

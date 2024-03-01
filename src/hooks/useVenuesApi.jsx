@@ -1,19 +1,58 @@
 // project-exam-2-holidaze/src/hooks/useVenuesApi.jsx
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useState, useEffect } from 'react';
 import BASE_URL from '../constants/api';
+import useAuthStore from '../stores/authStore'; 
 
 // Assuming fetch functions similar to those in venuesStore are defined here
 
-const useFetchVenues = () => {
-  return useQuery({
-    queryKey: ['venues'],
-    queryFn: async () => {
-      const response = await fetch(`${BASE_URL}/venues`);
-      if (!response.ok) throw new Error('Failed to fetch venues');
-      return response.json();
+const fetchVenues = async (offset = 0, limit = 100) => {
+  const response = await fetch(`${BASE_URL}/venues?limit=${limit}&offset=${offset}`, {
+    method: 'GET',
+    headers: {
+      // If your API requires authorization, include the token in the request headers
+      'Authorization': `Bearer ${useAuthStore.getState().token}`,
     },
   });
+  if (!response.ok) throw new Error('Failed to fetch venues');
+  return response.json();
 };
+
+const useFetchVenues = () => {
+  const [offset, setOffset] = useState(0);
+  const [allVenues, setAllVenues] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const loadVenues = async () => {
+      try {
+        setIsLoading(true);
+        let venues = [];
+        let hasMore = true;
+        
+        while (hasMore) {
+          const newVenues = await fetchVenues(offset);
+          venues = [...venues, ...newVenues];
+          setOffset(offset + newVenues.length);
+          hasMore = newVenues.length > 0;
+          if (!hasMore) break; // Exit loop if an empty array is received
+        }
+
+        setAllVenues(venues);
+      } catch (error) {
+        setError(error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadVenues();
+  }, []); // Empty dependency array ensures this runs once on mount
+
+  return { data: allVenues, isLoading, error };
+};
+
 
 const useCreateVenue = () => {
   const queryClient = useQueryClient();
