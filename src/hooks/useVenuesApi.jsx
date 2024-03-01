@@ -34,8 +34,12 @@ const useCreateVenue = () => {
     onSuccess: () => {
       queryClient.invalidateQueries(['venues']);
     },
+    onError: (error) => {
+      console.error("Error creating venue:", error.response ? error.response.data : error);
+    },
   });
 };
+
 
 // Fetch a single venue by ID
 const useFetchVenueById = (venueId) => {

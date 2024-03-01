@@ -62,11 +62,28 @@ const CreateVenueForm = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
   
-    createVenue(formData, { // Pass formData as payload
-      onSuccess: () => {
-        navigate('/manager-profile'); // Navigate upon successful creation
+    // Convert price and maxGuests to numbers
+    const submissionData = {
+      ...formData,
+      price: parseFloat(formData.price),
+      maxGuests: parseInt(formData.maxGuests, 10),
+      rating: parseFloat(formData.rating), // Ensure rating is a float
+      // Ensure lat and lng are floats if they are not empty
+      location: {
+        ...formData.location,
+        lat: formData.location.lat ? parseFloat(formData.location.lat) : 0,
+        lng: formData.location.lng ? parseFloat(formData.location.lng) : 0,
       },
-      // Optionally handle errors directly via the `error` variable
+    };
+
+    if (!submissionData.media.length) {
+      delete submissionData.media;
+    }
+  
+    createVenue(submissionData, {
+      onSuccess: () => {
+        navigate('/manager-profile');
+        console.log("Submitting venue data:", submissionData);},
     });
   };
 
