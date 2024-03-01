@@ -2,35 +2,42 @@
 
 import { create } from 'zustand';
 
-const useAuthStore = create((set, get) => ({
-  // Initialize state from localStorage to maintain persistence across sessions
+const useAuthStore = create((set) => ({
   token: localStorage.getItem('token') || null,
-  user: JSON.parse(localStorage.getItem('user')) || null,
+  // Use a try-catch block to safely attempt to parse the 'user' item
+  user: (() => {
+    try {
+      const user = localStorage.getItem('user');
+      return user ? JSON.parse(user) : null;
+    } catch (e) {
+      console.error('Error parsing user from localStorage:', e);
+      return null;
+    }
+  })(),
 
-  // Actions for updating the state
   setUser: (user) => {
-    localStorage.setItem('user', JSON.stringify(user)); // Persist user
+    localStorage.setItem('user', JSON.stringify(user));
     set({ user });
   },
   setToken: (token) => {
     if (token) {
-      localStorage.setItem('token', token); // Persist token
+      localStorage.setItem('token', token);
       set({ token });
     } else {
-      localStorage.removeItem('token'); // Clear token from storage on logout
-      localStorage.removeItem('user'); // Also clear user info
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
       set({ token: null, user: null });
     }
   },
   setError: (error) => set({ error }),
 
-  // Utility actions
   logoutUser: () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     set({ user: null, token: null });
   },
 }));
+
 
 // Utility functions
 export const isAuthenticated = () => {

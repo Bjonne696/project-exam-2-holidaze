@@ -1,32 +1,56 @@
+// project-exam-2-hollidaze/src/hooks/useAuthHooks.jsx
+
 import useAuthStore from '../stores/authStore'; // Adjust the import path as necessary
+import BASE_URL from '../constants/api';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import * as authService from './authService'; // Adjust the import path as necessary
+
+const updateAuthState = (data, queryClient) => {
+  if (data.accessToken) {
+    localStorage.setItem('token', data.accessToken);
+    localStorage.setItem('user', JSON.stringify(data.user));
+    useAuthStore.setState({ user: data.user, token: data.accessToken });
+    queryClient.setQueryData(['auth', 'user'], data.user);
+    queryClient.setQueryData(['auth', 'token'], data.accessToken);
+  }
+};
+
+const handleLoginSuccess = (response) => {
+  const { accessToken, ...userData } = response;
+  useAuthStore.getState().setToken(accessToken);
+  useAuthStore.getState().setUser(userData);
+  console.log("Logged in user data:", userData);
+};
+
 
 export const useRegisterUser = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: authService.fetchRegisterUser,
-    onSuccess: (data) => {
-      if (data.accessToken) {
-        localStorage.setItem('token', data.accessToken);
-        queryClient.setQueryData(['auth', 'user'], data.user);
-        queryClient.setQueryData(['auth', 'token'], data.accessToken);
-      }
+    mutationFn: async (userData) => {
+      const response = await fetch(`${BASE_URL}/auth/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(userData),
+      });
+      if (!response.ok) throw new Error('Failed to register');
+      return response.json();
     },
+    onSuccess: (data) => updateAuthState(data, queryClient),
   });
 };
 
 export const useLoginUser = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: authService.fetchLoginUser,
-    onSuccess: (data) => {
-      if (data.accessToken) {
-        localStorage.setItem('token', data.accessToken);
-        queryClient.setQueryData(['auth', 'user'], data.user);
-        queryClient.setQueryData(['auth', 'token'], data.accessToken);
-      }
+    mutationFn: async (credentials) => {
+      const response = await fetch(`${BASE_URL}/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(credentials),
+      });
+      if (!response.ok) throw new Error('Failed to login');
+      return response.json();
     },
+    onSuccess: (data) => updateAuthState(data, queryClient),
   });
 };
 
