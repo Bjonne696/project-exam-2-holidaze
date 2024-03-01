@@ -1,30 +1,25 @@
 // project-exam-2-holidaze/src/pages/HomePage.jsx
 
-import React, { useEffect } from 'react';
-
-import useVenuesStore from '../stores/venuesStore';
+import React from 'react';
+import { useFetchVenues } from '../hooks/useVenuesApi'; // Adjust the import path as necessary
 import VenueList from "../components/venues/VenueList";
 import VenueFilter from "../components/venues/VenueFilter";
 
-
 const HomePage = () => {
-	const { venues, isLoading, error, fetchVenues, resetVenues } = useVenuesStore();
-  
-	useEffect(() => {
-	  resetVenues(); // Reset the state before fetching
-	  fetchVenues();
-	  // Ensure fetchVenues and resetVenues are included in the dependency array if they are wrapped in useCallback or might change
-	}, [fetchVenues, resetVenues]);
-  
-	if (isLoading) return <div>Loading...</div>;
-	if (error) return <div>Error: {error.message}</div>;
-  
-	return (
-	  <div className="container mx-auto">
-		<VenueFilter venues={venues} />
-		<VenueList venues={venues} />
-	  </div>
-	);
-  };
-  
-  export default HomePage;
+  // Use the React Query hook for fetching venues
+  const { data: venues, isLoading, error } = useFetchVenues();
+
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error.message}</div>;
+
+  return (
+    <div className="container mx-auto">
+      {/* Assuming VenueFilter can operate directly on venues data */}
+      <VenueFilter venues={venues} />
+      {/* VenueList no longer needs venues passed as props if it's using useFetchVenues internally */}
+      <VenueList />
+    </div>
+  );
+};
+
+export default HomePage;

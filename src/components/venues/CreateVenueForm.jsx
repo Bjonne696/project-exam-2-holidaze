@@ -2,13 +2,11 @@
 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import useAuthStore from '../../stores/authStore';
-import useVenuesStore from '../../stores/venuesStore';
+import { useCreateVenue } from '../../hooks/useVenuesApi'; // Import the useCreateVenue hook
 
 const CreateVenueForm = () => {
   const navigate = useNavigate();
-  const { token } = useAuthStore((state) => state); // Correctly access the token
-  const { createVenue } = useVenuesStore(); // Access createVenue action correctly
+  const { mutate: createVenue, error, isLoading } = useCreateVenue(); // Use the React Query hook
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -61,28 +59,20 @@ const CreateVenueForm = () => {
     }
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
 
-    const payload = {
-      ...formData,
-      price: parseFloat(formData.price),
-      maxGuests: parseInt(formData.maxGuests, 10),
-      location: {
-        ...formData.location,
-        lat: formData.location.lat ? parseFloat(formData.location.lat) : 0,
-        lng: formData.location.lng ? parseFloat(formData.location.lng) : 0,
+    createVenue(payload, {
+      onSuccess: () => {
+        navigate('/manager-profile'); // Navigate upon successful creation
       },
-    };
-
-
-    try {
-      await createVenue(payload, token);
-      navigate('/manager-profile'); // Adjust as necessary
-    } catch (error) {
-      console.error("Error creating venue:", error.message);
-    }
+      // Optionally handle errors directly via the `error` variable
+    });
   };
+
+
+  if (isLoading) return <div>Creating venue...</div>;
+  if (error) return <div>Error creating venue: {error.message}</div>;
 
 
   return (

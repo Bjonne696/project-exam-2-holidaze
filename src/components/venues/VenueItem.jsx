@@ -3,24 +3,26 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { Card } from 'react-daisyui';
-import { Link, useNavigate } from 'react-router-dom'; // Ensure useNavigate is imported here
-import useAuthStore from '../../stores/authStore';
-import useVenuesStore from '../../stores/venuesStore';
+import { Link, useNavigate } from 'react-router-dom';
+import { useDeleteVenue } from '../../hooks/useVenuesApi'; // Import the useDeleteVenue hook
 
 const VenueItem = ({ data, isDetailedView = false, showActions = false, onDeleteClick }) => {
-  const { name, description, media, rating, maxGuests, price, created, updated, meta, location, owner, bookings } = data;
+  const { name, description, media, rating, maxGuests, price, created, updated } = data;
   const [imageError, setImageError] = useState(false);
-  const imageSrc = media.length > 0 ? media[0] : null;
   const navigate = useNavigate();
-  const { token } = useAuthStore((state) => state);
-  const { deleteVenue } = useVenuesStore();
-
-  const handleDelete = async () => {
-    await deleteVenue(data.id, token);
-    onDeleteClick && onDeleteClick();
+  const deleteVenue = useDeleteVenue(); // Adjusted to use React Query hook
+  
+  const handleDelete = () => {
+    deleteVenue.mutate(data.id, {
+      onSuccess: () => {
+        // Optionally, trigger a refetch or use onDeleteClick as a callback to refresh the list
+        onDeleteClick && onDeleteClick();
+      },
+    });
   };
 
 
+  const imageSrc = media.length > 0 ? media[0] : null;
   const imageContent = imageSrc && !imageError ? (
     <img src={imageSrc} alt={name} onError={() => setImageError(true)} className="h-52 w-full object-cover block rounded-t-lg" />
   ) : (

@@ -2,14 +2,13 @@
 
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import useAuthStore from '../../stores/authStore';
-import useVenuesStore from '../../stores/venuesStore';
+import { useFetchVenueById, useUpdateVenue } from '../../hooks/useVenuesApi';
 
 const UpdateVenueForm = () => {
   const { venueId } = useParams();
   const navigate = useNavigate();
-  const { token } = useAuthStore((state) => state);
-  const { venues, fetchVenueById, updateVenue } = useVenuesStore();
+  const { data: venue, isLoading: isLoadingVenue } = useFetchVenueById(venueId);
+  const { mutate: updateVenue, isLoading: isUpdatingVenue, error: updateError } = useUpdateVenue();
 
   // Initialize formData state with fields expected in the form.
   const [formData, setFormData] = useState({
@@ -21,37 +20,36 @@ const UpdateVenueForm = () => {
   });
 
   useEffect(() => {
-    const venue = venues.find((venue) => venue.id === venueId);
     if (venue) {
-      // Ensure media is always an array.
-      setFormData({ ...venue, media: venue.media || [] });
-    } else {
-      // If venue not found in state, attempt to fetch it.
-      fetchVenueById(venueId, token); // Ensure fetchVenueById is adapted to use token if required.
+      setFormData({ 
+        ...venue, 
+        media: venue.media || [] 
+      });
     }
-  }, [venueId, venues, fetchVenueById, token]);
+  }, [venue]);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     if (type === 'checkbox') {
-      setFormData((prev) => ({ ...prev, [name]: checked }));
+      setFormData(prev => ({ ...prev, [name]: checked }));
     } else if (name === 'media') {
-      // Convert string back to array when changing the media field
-      setFormData((prev) => ({ ...prev, media: value.split(',').map((url) => url.trim()) }));
+      setFormData(prev => ({ ...prev, media: value.split(',').map(url => url.trim()) }));
     } else {
-      setFormData((prev) => ({ ...prev, [name]: value }));
+      setFormData(prev => ({ ...prev, [name]: value }));
     }
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    try {
-      await updateVenue(venueId, { ...formData, price: parseFloat(formData.price), maxGuests: parseInt(formData.maxGuests) }, token);
-      navigate('/manager-profile');
-    } catch (error) {
-      console.error("Error updating venue:", error.message);
-    }
+    updateVenue({ venueId, formData }, {
+      onSuccess: () => {
+        navigate('/manager-profile'); // Redirect on success
+      },
+    });
   };
+
+  if (isLoadingVenue || isUpdatingVenue) return <div>Loading...</div>;
+  if (updateError) return <div>Error: {updateError.message}</div>;
 
   return (
       <div className="container mx-auto my-8">

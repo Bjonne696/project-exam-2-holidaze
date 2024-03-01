@@ -1,113 +1,22 @@
 // src/stores/bookingsStore.js
 
 import { create } from 'zustand';
-import BASE_URL from '../constants/api';
 
-const useBookingsStore = create((set, get) => ({
-  bookings: [],
-  isLoading: false,
-  error: null,
+const useBookingsStore = create((set) => ({
+  // Example state: ID of a booking selected in the UI
+  selectedBookingId: null,
 
-
-  fetchBookingsForVenue: async (venueId) => {
-    const { token } = get();
-    set({ isLoading: true });
-    try {
-      const response = await fetch(`${BASE_URL}/bookings?_venue=true`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-      if (!response.ok) throw new Error('Failed to fetch bookings for the venue');
-      const bookings = await response.json();
-      set({ bookings: bookings.filter(booking => booking.venue.id === venueId), isLoading: false });
-    } catch (error) {
-      set({ isLoading: false, error: error.message });
-    }
-  },
-
-  fetchUserBookings: async (userName, authToken, data) => {
-    set({ isLoading: true });
-    try {
-      const response = await fetch(`${BASE_URL}/profiles/${userName}/bookings`, {
-        headers: {
-
-          'Authorization': `Bearer ${authToken}`,
-        },
-      });
-      if (!response.ok) {
-        const errorMsg = await response.json();
-        throw new Error(errorMsg);
-      }
-      const bookings = await response.json();
-      set({ bookings, isLoading: false });
-    } catch (error) {
-      set({ error: error.message, isLoading: false });
-    }
-},
-
-  createBooking: async (bookingData) => {
-    const { token } = get();
-    try {
-      const response = await fetch(`${BASE_URL}/bookings`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify(bookingData),
-      });
-      if (!response.ok) throw new Error('Failed to create booking');
-      // Optionally refresh bookings after creation
-      get().fetchUserBookings();
-    } catch (error) {
-      set({ error: error.message });
-    }
-  },
-
-  updateBooking: async ({ bookingId, updateData }) => {
-    const { token } = get();
-    try {
-      const response = await fetch(`${BASE_URL}/bookings/${bookingId}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify(updateData),
-      });
-      if (!response.ok) throw new Error('Failed to update booking');
-      // Optionally refresh bookings after update
-      get().fetchUserBookings();
-    } catch (error) {
-      set({ error: error.message });
-    }
-  },
-
-  deleteBooking: async (bookingId) => {
-    let { token } = get();
-    // Fallback to localStorage if token is undefined in the store
-    if (!token) {
-      token = localStorage.getItem('token');
-    }
-    console.log(`Token being used: Bearer ${token}`); // Verify token
+  // Actions
+  setSelectedBookingId: (id) => set({ selectedBookingId: id }),
   
-    try {
-      const response = await fetch(`${BASE_URL}/bookings/${bookingId}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-      if (!response.ok) throw new Error('Failed to delete booking');
-      // Refresh bookings after deletion...
-    } catch (error) {
-      console.error('Error deleting booking:', error);
-      set({ error: error.message });
-    }
-  },
+  // You can add more UI-related state and actions as needed.
+  // For example, you might want to track whether a booking details modal is open:
+  isBookingDetailsModalOpen: false,
+  setBookingDetailsModalOpen: (isOpen) => set({ isBookingDetailsModalOpen: isOpen }),
 
+  // Any other global states or actions that relate to the bookings in your application.
+  // This could include filtering options, search terms, or anything else that
+  // might need to be shared across components but doesn't directly involve fetching data.
 }));
 
 export default useBookingsStore;
-
