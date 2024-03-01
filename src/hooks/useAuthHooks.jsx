@@ -3,6 +3,7 @@ import useAuthStore from '../stores/authStore';
 import BASE_URL from '../constants/api';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
+// Function to update Zustand store and local storage with user data and token
 const updateAuthState = (data, queryClient) => {
   if (data.accessToken) {
     localStorage.setItem('token', data.accessToken);
@@ -26,6 +27,7 @@ const updateAuthState = (data, queryClient) => {
   }
 };
 
+// Function to register a new user
 export const useRegisterUser = () => {
   const queryClient = useQueryClient();
   return useMutation({
@@ -46,6 +48,7 @@ export const useRegisterUser = () => {
   });
 };
 
+// Function to login user
 export const useLoginUser = () => {
   const queryClient = useQueryClient();
   return useMutation({
@@ -66,8 +69,9 @@ export const useLoginUser = () => {
   });
 };
 
-export const becomeVenueManager = async (token) => {
-  const response = await fetch(`${BASE_URL}/profiles/becomeVenueManager`, {
+// Function to become venue manager
+export const becomeVenueManager = async (token, name) => {
+  const response = await fetch(`${BASE_URL}/profiles/${name}`, {
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json',
@@ -75,26 +79,38 @@ export const becomeVenueManager = async (token) => {
     },
     body: JSON.stringify({ venueManager: true }),
   });
-  if (!response.ok) throw new Error('Failed to become venue manager');
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.message || 'Failed to become venue manager');
+  }
+
   return await response.json();
 };
   
-  // Function to revoke venue manager status
-  export const revokeVenueManagerStatus = async (token) => {
-    const response = await fetch(`${BASE_URL}/profiles/revokeVenueManagerStatus`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
-      },
-      body: JSON.stringify({ venueManager: false }),
-    });
-    if (!response.ok) throw new Error('Failed to revoke venue manager status');
-    return response.json();
-  };
+// Function to revoke venue manager status
+export const revokeVenueManagerStatus = async (token, name) => {
+  const response = await fetch(`${BASE_URL}/profiles/${name}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
+    },
+    body: JSON.stringify({ venueManager: false }),
+  });
 
-// hooks
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.message || 'Failed to revoke venue manager status');
+  }
 
+  return response.json();
+};
+// ********************************************************************************************************************
+//                          '''''''''''''''''''''HOOKS'''''''''''''''''''''''''
+// ********************************************************************************************************************
+
+// hook to logout user
 export const useLogoutUser = () => {
   const queryClient = useQueryClient();
   return {
@@ -108,53 +124,49 @@ export const useLogoutUser = () => {
   };
 };
 
-  
-  export const useBecomeVenueManager = () => {
-    const queryClient = useQueryClient();
-    const setUser = useAuthStore(state => state.setUser);
-    const token = useAuthStore(state => state.token);
-  
-    return useMutation({
-      mutationFn: async () => {
-        const response = await fetch(`${BASE_URL}/profiles/${user.name}`, { // Ensure you replace `user.name` with the actual username from your state
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`,
-          },
-          body: JSON.stringify({ venueManager: true }),
-        });
-        if (!response.ok) {
-          // Handle error, possibly by throwing an exception
-          const errorData = await response.json();
-          throw new Error(errorData.message || 'Failed to become venue manager');
-        }
-        return await response.json(); // This should include the updated user data
-      },
-      onSuccess: (updatedUser) => {
-        // Update local storage and Zustand store with the new user data
-        localStorage.setItem('user', JSON.stringify(updatedUser));
-        setUser(updatedUser);
-        // Optionally, update React Query cache if you're caching user data there
-        queryClient.setQueryData(['auth', 'user'], updatedUser);
-      },
-    });
-  };
-  
-  export const useRevokeVenueManagerStatus = () => {
-    const queryClient = useQueryClient();
-    const setUser = useAuthStore(state => state.setUser); // Assuming this action exists
-    
-    return useMutation({
-      mutationFn: async () => {
-        const token = localStorage.getItem('token');
-        return authService.revokeVenueManagerStatus(token);
-      },
-      onSuccess: (data) => {
-        // Assuming the API returns updated user data
-        queryClient.setQueryData(['auth', 'user'], data);
-        setUser(data); // Update Zustand store with the new user data
-      },
-    });
-  };
+// hook to become venue manager  
+export const useBecomeVenueManager = () => {
+  const queryClient = useQueryClient();
+  const setUser = useAuthStore((state) => state.setUser);
+  const token = useAuthStore((state) => state.token);
 
+  return useMutation({
+    mutationFn: async () => {
+      const user = useAuthStore.getState().user;
+
+      if (!user || !user.name) {
+        throw new Error('User information not available.');
+      }
+
+      return becomeVenueManager(token, user.name); // Use the locally defined function
+    },
+    onSuccess: (updatedUser) => {
+      localStorage.setItem('user', JSON.stringify(updatedUser));
+      setUser(updatedUser);
+      queryClient.setQueryData(['auth', 'user'], updatedUser);
+    },
+  });
+};
+  
+// hook to revoke venue manager status
+export const useRevokeVenueManagerStatus = () => {
+  const queryClient = useQueryClient();
+  const setUser = useAuthStore((state) => state.setUser);
+
+  return useMutation({
+    mutationFn: async () => {
+      const token = localStorage.getItem('token');
+      const user = useAuthStore.getState().user;
+
+      if (!user || !user.name) {
+        throw new Error('User information not available.');
+      }
+
+      return revokeVenueManagerStatus(token, user.name); // Use the locally defined function
+    },
+    onSuccess: (data) => {
+      queryClient.setQueryData(['auth', 'user'], data);
+      setUser(data);
+    },
+  });
+};

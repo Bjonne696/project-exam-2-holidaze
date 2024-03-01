@@ -1,5 +1,4 @@
 // project-exam-2-holidaze/src/stores/authStore.jsx
-
 import { create } from 'zustand';
 
 const useAuthStore = create((set) => ({
@@ -18,6 +17,7 @@ const useAuthStore = create((set) => ({
     localStorage.setItem('user', JSON.stringify(user));
     set({ user });
   },
+
   setToken: (token) => {
     if (token) {
       localStorage.setItem('token', token);
@@ -35,9 +35,6 @@ const useAuthStore = create((set) => ({
     set({ user: null, token: null });
   },
 }));
-
-
-
 
 // Utility functions
 export const isAuthenticated = () => {
