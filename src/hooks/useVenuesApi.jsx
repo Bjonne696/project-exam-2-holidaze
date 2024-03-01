@@ -1,3 +1,4 @@
+// project-exam-2-holidaze/src/hooks/useVenuesApi.jsx
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import BASE_URL from '../constants/api';
 
@@ -50,44 +51,52 @@ const useFetchVenueById = (venueId) => {
   };
 
 // Fetch venues managed by a manager
-const useFetchManagedVenues = (managerId, token) => {
-    return useQuery({
-      queryKey: ['managedVenues', managerId],
-      queryFn: async () => {
-        const response = await fetch(`${BASE_URL}/venues/managed/${managerId}`, {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-          },
-        });
-        if (!response.ok) {
-          throw new Error('Failed to fetch managed venues');
-        }
-        return response.json();
-      },
-      enabled: !!managerId && !!token, // Only run the query if managerId and token are truthy
-    });
-  };
+const useFetchManagedVenues = (name, token) => {
+  return useQuery({
+    queryKey: ['managedVenues', name],
+    queryFn: async () => {
+      const response = await fetch(`${BASE_URL}/profiles/${name}/venues`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch managed venues');
+      }
+
+      return response.json();
+    },
+    enabled: !!name && !!token, // Only run the query if name and token are truthy
+  });
+};
   
   // Update a venue
   const useUpdateVenue = () => {
     const queryClient = useQueryClient();
+  
     return useMutation({
-      mutationFn: async ({ venueId, venueData }) => {
-        const token = localStorage.getItem('token'); // Retrieve the auth token
+      mutationFn: async ({ venueId, formData }) => {
+        const token = localStorage.getItem('token');
         const response = await fetch(`${BASE_URL}/venues/${venueId}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`,
           },
-          body: JSON.stringify(venueData),
+          body: JSON.stringify(formData),
         });
-        if (!response.ok) throw new Error('Failed to update venue');
+  
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.message || 'Failed to update venue');
+        }
+  
         return response.json();
       },
       onSuccess: () => {
-        queryClient.invalidateQueries(['venues']); // Invalidate all venues to fetch fresh data
-        queryClient.invalidateQueries(['venue']); // Optionally, if you cache venues individually
+        // Optionally, you can refetch relevant queries or invalidate specific cache keys
+        queryClient.invalidateQueries('venues'); // Replace 'venues' with your actual query key
       },
     });
   };
@@ -113,4 +122,11 @@ const useFetchManagedVenues = (managerId, token) => {
     });
   };  
 
-  export { useFetchVenues, useCreateVenue, useFetchVenueById, useFetchManagedVenues, useUpdateVenue, useDeleteVenue} 
+  export {
+    useFetchVenues,
+    useCreateVenue,
+    useFetchVenueById,
+    useFetchManagedVenues,  // Corrected export
+    useUpdateVenue,
+    useDeleteVenue
+  };

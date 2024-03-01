@@ -31,25 +31,38 @@ const UpdateVenueForm = () => {
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     if (type === 'checkbox') {
-      setFormData(prev => ({ ...prev, [name]: checked }));
+      setFormData((prev) => ({ ...prev, [name]: checked }));
+    } else if (type === 'number' && !isNaN(value)) {
+      // Ensure that only numeric values are accepted for price and maxGuests
+      setFormData((prev) => ({ ...prev, [name]: Number(value) }));
     } else if (name === 'media') {
-      setFormData(prev => ({ ...prev, media: value.split(',').map(url => url.trim()) }));
+      setFormData((prev) => ({
+        ...prev,
+        media: value.split(',').map((url) => url.trim()),
+      }));
     } else {
-      setFormData(prev => ({ ...prev, [name]: value }));
+      setFormData((prev) => ({ ...prev, [name]: value }));
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    updateVenue({ venueId, formData }, {
-      onSuccess: () => {
-        navigate('/manager-profile'); // Redirect on success
-      },
-    });
+    try {
+      await updateVenue({ venueId, formData }, {
+        onSuccess: () => {
+          navigate('/manager-profile'); // Redirect on success
+        },
+      });
+    } catch (error) {
+      console.error('Error updating venue:', error);
+      // Log the error response from the server
+      if (error.response) {
+        console.error('Error response:', error.response.data);
+      }
+      // Optionally, you can set the error state to display a user-friendly message
+       setError('Failed to update venue. Please check the provided information.');
+    }
   };
-
-  if (isLoadingVenue || isUpdatingVenue) return <div>Loading...</div>;
-  if (updateError) return <div>Error: {updateError.message}</div>;
 
   return (
       <div className="container mx-auto my-8">
@@ -84,7 +97,7 @@ const UpdateVenueForm = () => {
         <div>
           <label htmlFor="price" className="block text-sm font-medium text-gray-700">Price:</label>
           <input
-            type="number"
+            type="number" // Ensure that the input type is 'number'
             name="price"
             id="price"
             value={formData.price}
@@ -97,7 +110,7 @@ const UpdateVenueForm = () => {
         <div>
           <label htmlFor="maxGuests" className="block text-sm font-medium text-gray-700">Max Guests:</label>
           <input
-            type="number"
+            type="number" // Ensure that the input type is 'number'
             name="maxGuests"
             id="maxGuests"
             value={formData.maxGuests}

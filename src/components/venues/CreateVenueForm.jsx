@@ -61,8 +61,8 @@ const CreateVenueForm = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
-    createVenue(payload, {
+  
+    createVenue(formData, { // Pass formData as payload
       onSuccess: () => {
         navigate('/manager-profile'); // Navigate upon successful creation
       },
