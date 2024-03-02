@@ -1,6 +1,7 @@
 // src/hooks/useBookingsApi.js
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import BASE_URL from '../constants/api';
+import useAuthStore from '../stores/authStore';
 
 // Function to fetch bookings for a specific venue
 const fetchBookingsForVenue = async (venueId, token) => {
@@ -33,6 +34,7 @@ const createBooking = async (bookingData, token) => {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
+      // Ensure the token is correctly included in the authorization header
       'Authorization': `Bearer ${token}`,
     },
     body: JSON.stringify(bookingData),
@@ -68,8 +70,10 @@ const deleteBooking = async (bookingId, token) => {
   };
 
 
+// ********************************************************************************************************************
+//                          '''''''''''''''''''''HOOKS'''''''''''''''''''''''''
+// ********************************************************************************************************************
 
-// React Query Hooks
 export const useFetchBookingsForVenue = ({ venueId, token }) => {
   return useQuery({
     queryKey: ['bookingsForVenue', venueId],
@@ -88,14 +92,32 @@ export const useFetchUserBookings = ({ userName, token }) => {
 
 export const useCreateBooking = () => {
   const queryClient = useQueryClient();
+  const { token } = useAuthStore(state => ({ token: state.token })); // Destructure token from useAuthStore
+
   return useMutation({
-    mutationFn: (newBooking) => createBooking(newBooking),
+    mutationFn: (newBooking) => {
+      // Ensure the fetch call includes the Authorization header correctly
+      return fetch(`${BASE_URL}/bookings`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`, // Use token from useAuthStore
+        },
+        body: JSON.stringify(newBooking),
+      })
+      .then(response => {
+        if (!response.ok) throw new Error('Failed to create booking');
+        return response.json();
+      });
+    },
     onSuccess: () => {
+      // Invalidate and refetch as necessary
       queryClient.invalidateQueries(['bookingsForVenue']);
       queryClient.invalidateQueries(['userBookings']);
     },
   });
 };
+
 
 export const useUpdateBooking = () => {
   const queryClient = useQueryClient();
