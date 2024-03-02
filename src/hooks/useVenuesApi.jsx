@@ -62,17 +62,20 @@ const useCreateVenue = () => {
 
 
 // Fetch a single venue by ID
+// Adjusted to fetch a single venue by ID including its bookings
 const useFetchVenueById = (venueId) => {
-    return useQuery({
-      queryKey: ['venue', venueId],
-      queryFn: async () => {
-        const response = await fetch(`${BASE_URL}/venues/${venueId}`);
-        if (!response.ok) throw new Error('Failed to fetch venue');
-        return response.json();
-      },
-      enabled: !!venueId, // Only run the query if venueId is truthy
-    });
-  };
+  return useQuery({
+    queryKey: ['venue', venueId, 'withBookings'],
+    queryFn: async () => {
+      // Updated to include the _bookings query parameter
+      const response = await fetch(`${BASE_URL}/venues/${venueId}?_bookings=true`);
+      if (!response.ok) throw new Error('Failed to fetch venue with bookings');
+      return response.json();
+    },
+    enabled: !!venueId, // Only run the query if venueId is truthy
+  });
+};
+
 
 // Fetch venues managed by a manager
 const useFetchManagedVenues = (name, token) => {
@@ -146,11 +149,14 @@ const useFetchManagedVenues = (name, token) => {
     });
   };  
 
+  // Fetch bookings for a specific venue MAYBE BE IN ANOTHER FILE: useBookingsApi.jsx
+
+
   export {
     fetchVenuesBatch,
     useCreateVenue,
     useFetchVenueById,
     useFetchManagedVenues,  // Corrected export
     useUpdateVenue,
-    useDeleteVenue
+    useDeleteVenue,
   };

@@ -4,11 +4,13 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useFetchVenueById, useUpdateVenue } from '../../hooks/useVenuesApi';
 
+
 const UpdateVenueForm = () => {
   const { venueId } = useParams();
   const navigate = useNavigate();
   const { data: venue, isLoading: isLoadingVenue } = useFetchVenueById(venueId);
   const { mutate: updateVenue, isLoading: isUpdatingVenue, error: updateError } = useUpdateVenue();
+
 
   // Initialize formData state with fields expected in the form.
   const [formData, setFormData] = useState({
@@ -136,8 +138,23 @@ const UpdateVenueForm = () => {
         {/* Submit Button */}
         <button type="submit" className="btn btn-primary">Update Venue</button>
       </form>
+      
+      <div className="my-8">
+  <h3 className="text-xl font-bold mb-4">Venue Bookings</h3>
+  {isLoadingVenue ? (
+    <p>Loading venue details...</p>
+  ) : (
+    <ul>
+      {venue?.bookings?.map((booking) => ( // Ensure you're accessing bookings from the venue object
+        <li key={booking.id}>
+          {booking.dateFrom} to {booking.dateTo} - {booking.guests} guests
+        </li>
+      ))}
+    </ul>
+  )}
+</div>
     </div>
   );
-};
+}
 
 export default UpdateVenueForm;
