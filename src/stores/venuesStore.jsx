@@ -1,10 +1,8 @@
 // project-exam-2-holidaze/src/stores/venuesStore.jsx
+import{ create } from 'zustand';
+import { fetchVenuesBatch } from '../hooks/useVenuesApi'; // Adjust the import path as needed
 
-
-import { create } from 'zustand';
-import { fetchVenuesBatch } from '../hooks/useVenuesApi'; // Assume this utility function handles fetching
-
-const useVenuesStore = create((set, get) => ({
+const useVenuesStore = create((set) => ({
   venues: [],
   isLoading: false,
   error: null,
@@ -24,15 +22,16 @@ const useVenuesStore = create((set, get) => ({
           offset += batch.length;
         }
       } catch (error) {
-        set({ error });
-        hasMore = false; // Stop the loop on error
+        set({ error, isLoading: false });
+        return;
       }
     }
 
-    set({ venues: allVenues, isLoading: false });
+    // Filter out duplicate venues based on their `id`
+    const uniqueVenues = Array.from(new Map(allVenues.map(venue => [venue['id'], venue])).values());
+
+    set({ venues: uniqueVenues, isLoading: false });
   },
-  selectedVenueId: null,
-  setSelectedVenueId: (id) => set({ selectedVenueId: id }),
 }));
 
 export default useVenuesStore;
