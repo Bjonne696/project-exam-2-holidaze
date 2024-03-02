@@ -2,13 +2,11 @@
 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import useAuthStore from '../../stores/authStore';
-import useVenuesStore from '../../stores/venuesStore';
+import { useCreateVenue } from '../../hooks/useVenuesApi'; // Import the useCreateVenue hook
 
 const CreateVenueForm = () => {
   const navigate = useNavigate();
-  const { token } = useAuthStore((state) => state); // Correctly access the token
-  const { createVenue } = useVenuesStore(); // Access createVenue action correctly
+  const { mutate: createVenue, error, isLoading } = useCreateVenue(); // Use the React Query hook
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -61,13 +59,16 @@ const CreateVenueForm = () => {
     }
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-
-    const payload = {
+  
+    // Convert price and maxGuests to numbers
+    const submissionData = {
       ...formData,
       price: parseFloat(formData.price),
       maxGuests: parseInt(formData.maxGuests, 10),
+      rating: parseFloat(formData.rating), // Ensure rating is a float
+      // Ensure lat and lng are floats if they are not empty
       location: {
         ...formData.location,
         lat: formData.location.lat ? parseFloat(formData.location.lat) : 0,
@@ -75,14 +76,20 @@ const CreateVenueForm = () => {
       },
     };
 
-
-    try {
-      await createVenue(payload, token);
-      navigate('/manager-profile'); // Adjust as necessary
-    } catch (error) {
-      console.error("Error creating venue:", error.message);
+    if (!submissionData.media.length) {
+      delete submissionData.media;
     }
+  
+    createVenue(submissionData, {
+      onSuccess: () => {
+        navigate('/manager-profile');
+        console.log("Submitting venue data:", submissionData);},
+    });
   };
+
+
+  if (isLoading) return <div>Creating venue...</div>;
+  if (error) return <div>Error creating venue: {error.message}</div>;
 
 
   return (

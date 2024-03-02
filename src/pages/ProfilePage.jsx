@@ -1,92 +1,98 @@
 //project-exam-2-holidaze/src/pages/ProfilePage.jsx
 
-import React, { useEffect } from 'react';
+import React from 'react';
+import { useFetchUserBookings, useDeleteBooking } from '../hooks/useBookingsApi';
 import useAuthStore from '../stores/authStore';
-import useBookingsStore from '../stores/bookingsStore';
+import { useBecomeVenueManager, useRevokeVenueManagerStatus } from '../hooks/useAuthHooks';
 
 const formatDate = (dateString) => {
-    const options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', timeZoneName: 'short' };
-    return new Intl.DateTimeFormat('en-US', options).format(new Date(dateString));
+  const options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', timeZoneName: 'short' };
+  return new Intl.DateTimeFormat('en-US', options).format(new Date(dateString));
 };
 
 function ProfilePage() {
-    const { user, token, becomeVenueManager, isVenueManager } = useAuthStore((state) => ({
-        user: state.user,
-        token: state.token,
-        becomeVenueManager: state.becomeVenueManager,
-        isVenueManager: state.user?.venueManager,
-    }));
-    const { bookings, fetchUserBookings, deleteBooking, isLoading, error } = useBookingsStore((state) => ({
-        bookings: state.bookings,
-        fetchUserBookings: state.fetchUserBookings,
-        deleteBooking: state.deleteBooking,
-        isLoading: state.isLoading,
-        error: state.error,
-    }));
+  const { user, token, logoutUser, setUser } = useAuthStore((state) => ({
+    user: state.user,
+    token: state.token,
+    logoutUser: state.logoutUser,
+    setUser: state.setUser, // Ensure you have a setUser method to update user state
+  }));
+  const { data: bookings, isLoading: isLoadingBookings, error: bookingsError } = useFetchUserBookings({ userName: user?.name, token });
+  const { mutate: deleteBooking } = useDeleteBooking();
+  const { mutate: becomeVenueManager, isError: isBecomeManagerError, error: becomeManagerError } = useBecomeVenueManager();
+  const { mutate: revokeManagerStatus, isError: isRevokeManagerError, error: revokeManagerError } = useRevokeVenueManagerStatus();
 
-    useEffect(() => {
-        if (token && user?.name) {
-            fetchUserBookings(user.name, token);
-        }
-    }, [user?.name, token, fetchUserBookings]); // fetchUserBookings added as a dependency
+  const handleBecomeVenueManagerClick = () => {
+    becomeVenueManager({}, {
+      onSuccess: (updatedUser) => {
+        console.log('You are now a venue manager');
+        setUser(updatedUser); // Update user state to reflect the new venue manager status
+      },
+    });
+  };
 
-    const handleBecomeVenueManager = async () => {
-        await becomeVenueManager({ name: user.name });
-        console.log('You are now a venue manager'); // Log success message or handle UI feedback
-    };
+  const handleRevokeManagerStatusClick = () => {
+    revokeManagerStatus({}, {
+      onSuccess: (updatedUser) => {
+        console.log('Venue manager status revoked.');
+        setUser(updatedUser); // Update user state to reflect the revocation of venue manager status
+      },
+    });
+  };
 
-    // Handler for deleting bookings and refreshing the list
-    const handleDeleteBooking = async (bookingId) => {
-        await deleteBooking(bookingId);
-        if (user?.name && token) {
-            fetchUserBookings(user.name, token); // Re-fetch bookings to refresh the list
-            console.log('Booking deleted successfully!'); // Log success message
-        }
-    };
-    
+  if (isLoadingBookings) return <div>Loading bookings...</div>;
+  if (bookingsError) return <div>Error: {bookingsError.message}</div>;
 
-    if (isLoading) return <div>Loading bookings...</div>;
-    if (error) return <div>Error: {error}</div>;
+  return (
+    <div className="container mx-auto">
+      <h1 className="text-xl font-bold">Profile Page</h1>
+      <div>Name: {user?.name}</div>
+      <div>Email: {user?.email}</div>
 
-    return (
-        <div className="container mx-auto">
-            <h1 className="text-xl font-bold">Profile Page</h1>
-            <div>Name: {user?.name}</div>
-            <div>Email: {user?.email}</div>
+      {/* Error handling for becoming/rejecting venue manager */}
+      {isBecomeManagerError && <p className="text-red-500">Error: {becomeManagerError.message}</p>}
+      {isRevokeManagerError && <p className="text-red-500">Error: {revokeManagerError.message}</p>}
 
-            {!isVenueManager && (
-                <button
-                    onClick={handleBecomeVenueManager}
-                    className="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-                >
-                    Become Venue Manager
-                </button>
-            )}
+      {!user?.venueManager && (
+        <button
+          onClick={handleBecomeVenueManagerClick}
+          className="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+        >
+          Become Venue Manager
+        </button>
+      )}
 
+      {user?.venueManager && (
+        <button
+          onClick={handleRevokeManagerStatusClick}
+          className="mt-4 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+        >
+          Revoke Manager Status
+        </button>
+      )}
 
-            <h2 className="text-lg font-bold mt-4">Your Bookings</h2>
-            {bookings.length > 0 ? (
-                bookings.map((booking) => (
-                    <div key={booking.id} className="mb-4 p-2 border rounded shadow">
-                        <div><strong>Booking ID:</strong> {booking.id}</div>
-                        <div><strong>From:</strong> {formatDate(booking.dateFrom)}</div>
-                        <div><strong>To:</strong> {formatDate(booking.dateTo)}</div>
-                        <div><strong>Guests:</strong> {booking.guests}</div>
-                        <div><strong>Booked on:</strong> {formatDate(booking.created)}</div>
-                        <button 
-                            onClick={() => handleDeleteBooking(booking.id)}
-                            className="mt-2 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
-                        >
-                            Delete Booking
-                        </button>
-                    </div>
-                ))
-            ) : (
-                <p>You have no bookings.</p>
-            )}
-        </div>
-    );
+      <h2 className="text-lg font-bold mt-4">Your Bookings</h2>
+      {bookings?.length > 0 ? (
+        bookings.map((booking) => (
+          <div key={booking.id} className="mb-4 p-2 border rounded shadow">
+            <div><strong>Booking ID:</strong> {booking.id}</div>
+            <div><strong>From:</strong> {formatDate(booking.dateFrom)}</div>
+            <div><strong>To:</strong> {formatDate(booking.dateTo)}</div>
+            <div><strong>Guests:</strong> {booking.guests}</div>
+            <div><strong>Booked on:</strong> {formatDate(booking.created)}</div>
+            <button 
+              onClick={() => deleteBooking(booking.id)}
+              className="mt-2 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+            >
+              Delete Booking
+            </button>
+          </div>
+        ))
+      ) : (
+        <p>You have no bookings.</p>
+      )}
+    </div>
+  );
 }
 
-export default ProfilePage;
-
+export default ProfilePage; 

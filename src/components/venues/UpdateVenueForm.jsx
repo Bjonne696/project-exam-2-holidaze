@@ -2,14 +2,15 @@
 
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import useAuthStore from '../../stores/authStore';
-import useVenuesStore from '../../stores/venuesStore';
+import { useFetchVenueById, useUpdateVenue } from '../../hooks/useVenuesApi';
+
 
 const UpdateVenueForm = () => {
   const { venueId } = useParams();
   const navigate = useNavigate();
-  const { token } = useAuthStore((state) => state);
-  const { venues, fetchVenueById, updateVenue } = useVenuesStore();
+  const { data: venue, isLoading: isLoadingVenue } = useFetchVenueById(venueId);
+  const { mutate: updateVenue, isLoading: isUpdatingVenue, error: updateError } = useUpdateVenue();
+
 
   // Initialize formData state with fields expected in the form.
   const [formData, setFormData] = useState({
@@ -21,23 +22,26 @@ const UpdateVenueForm = () => {
   });
 
   useEffect(() => {
-    const venue = venues.find((venue) => venue.id === venueId);
     if (venue) {
-      // Ensure media is always an array.
-      setFormData({ ...venue, media: venue.media || [] });
-    } else {
-      // If venue not found in state, attempt to fetch it.
-      fetchVenueById(venueId, token); // Ensure fetchVenueById is adapted to use token if required.
+      setFormData({ 
+        ...venue, 
+        media: venue.media || [] 
+      });
     }
-  }, [venueId, venues, fetchVenueById, token]);
+  }, [venue]);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     if (type === 'checkbox') {
       setFormData((prev) => ({ ...prev, [name]: checked }));
+    } else if (type === 'number' && !isNaN(value)) {
+      // Ensure that only numeric values are accepted for price and maxGuests
+      setFormData((prev) => ({ ...prev, [name]: Number(value) }));
     } else if (name === 'media') {
-      // Convert string back to array when changing the media field
-      setFormData((prev) => ({ ...prev, media: value.split(',').map((url) => url.trim()) }));
+      setFormData((prev) => ({
+        ...prev,
+        media: value.split(',').map((url) => url.trim()),
+      }));
     } else {
       setFormData((prev) => ({ ...prev, [name]: value }));
     }
@@ -46,10 +50,19 @@ const UpdateVenueForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await updateVenue(venueId, { ...formData, price: parseFloat(formData.price), maxGuests: parseInt(formData.maxGuests) }, token);
-      navigate('/manager-profile');
+      await updateVenue({ venueId, formData }, {
+        onSuccess: () => {
+          navigate('/manager-profile'); // Redirect on success
+        },
+      });
     } catch (error) {
-      console.error("Error updating venue:", error.message);
+      console.error('Error updating venue:', error);
+      // Log the error response from the server
+      if (error.response) {
+        console.error('Error response:', error.response.data);
+      }
+      // Optionally, you can set the error state to display a user-friendly message
+       setError('Failed to update venue. Please check the provided information.');
     }
   };
 
@@ -86,7 +99,7 @@ const UpdateVenueForm = () => {
         <div>
           <label htmlFor="price" className="block text-sm font-medium text-gray-700">Price:</label>
           <input
-            type="number"
+            type="number" // Ensure that the input type is 'number'
             name="price"
             id="price"
             value={formData.price}
@@ -99,7 +112,7 @@ const UpdateVenueForm = () => {
         <div>
           <label htmlFor="maxGuests" className="block text-sm font-medium text-gray-700">Max Guests:</label>
           <input
-            type="number"
+            type="number" // Ensure that the input type is 'number'
             name="maxGuests"
             id="maxGuests"
             value={formData.maxGuests}
@@ -125,8 +138,23 @@ const UpdateVenueForm = () => {
         {/* Submit Button */}
         <button type="submit" className="btn btn-primary">Update Venue</button>
       </form>
+      
+      <div className="my-8">
+  <h3 className="text-xl font-bold mb-4">Venue Bookings</h3>
+  {isLoadingVenue ? (
+    <p>Loading venue details...</p>
+  ) : (
+    <ul>
+      {venue?.bookings?.map((booking) => ( // Ensure you're accessing bookings from the venue object
+        <li key={booking.id}>
+          {booking.dateFrom} to {booking.dateTo} - {booking.guests} guests
+        </li>
+      ))}
+    </ul>
+  )}
+</div>
     </div>
   );
-};
+}
 
 export default UpdateVenueForm;

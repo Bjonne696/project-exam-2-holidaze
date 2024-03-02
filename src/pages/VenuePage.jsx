@@ -3,98 +3,95 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from 'react-router-dom';
 import DatePicker from "react-datepicker";
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQueryClient } from '@tanstack/react-query';
 import useAuthStore from '../stores/authStore';
 import 'react-datepicker/dist/react-datepicker.css';
-import useBookingsStore from '../stores/bookingsStore'; // Adjusted import
 import VenueItem from '../components/venues/VenueItem';
-import useVenueStore from '../stores/venuesStore';
-import { fetchBookingsForVenue } from '../hooks/bookings'; // Corrected import for fetchBookingsForVenue
+import { useFetchBookingsForVenue, useCreateBooking } from '../hooks/useBookingsApi';
+import { useFetchVenueById } from '../hooks/useVenuesApi';
 
 function VenuePage() {
-  const { id: venueId } = useParams(); // Use useParams to get the venueId from the URL
-  const [dateFrom, setDateFrom] = useState(new Date());
-  const [dateTo, setDateTo] = useState(new Date());
-  const [guests, setGuests] = useState(1); // Default to 1 guest
-  const queryClient = useQueryClient();
-  const { token } = useAuthStore((state) => ({ token: state.token }));
-  const { createBooking } = useBookingsStore();
+  const { id: venueId } = useParams();
+  const [guests, setGuests] = useState(1);
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(null);
+  const queryClient = useQueryClient();
+  const token = useAuthStore(state => state.token); // Safe access to token
+  
+  // Fetch venue details
+  const { data: venue } = useFetchVenueById(venueId);
+
+  // Fetch bookings for venue to determine unavailable dates
+  const { data: bookings } = useFetchBookingsForVenue(venueId, token);
   const [unavailableDates, setUnavailableDates] = useState([]);
-  const { venue, fetchVenueById } = useVenueStore(); // Destructure fetchVenueById from useVenueStore
+
+  const { mutate: createBooking, isLoading: isBookingLoading, error: bookingError } = useCreateBooking();
 
   useEffect(() => {
-    fetchVenueById(venueId);
-  }, [venueId, fetchVenueById]);
-
-  // Adjusted to fetchAllBookings and filtered by venueId client-side if needed
-  const { data: bookings, isLoading: isLoadingBookings } = useQuery({
-    queryKey: ['bookings', venueId],
-    queryFn: () => fetchVenueBookings(venueId),
-    enabled: !!venueId,
-  });
-
-  const bookingMutation = useMutation({
-    mutationFn: (newBooking) => createBooking(newBooking, token),
-    onSuccess: () => {
-      queryClient.invalidateQueries(['bookings', venueId]);
-    },
-    onError: (error) => {
-      alert(`Booking creation failed: ${error.message}`);
+    // Calculate unavailable dates based on bookings
+    if (bookings) {
+      const dates = bookings.reduce((acc, booking) => {
+        let currentDate = new Date(booking.dateFrom);
+        const endDate = new Date(booking.dateTo);
+        while (currentDate <= endDate) {
+          acc.push(new Date(currentDate));
+          currentDate.setDate(currentDate.getDate() + 1);
+        }
+        return acc;
+      }, []);
+      setUnavailableDates(dates);
     }
-  });
-
-  useEffect(() => {
-    const loadBookings = async () => {
-      if (token && venueId) {
-        const bookings = await fetchBookingsForVenue(venueId, token);
-        const dates = bookings.reduce((acc, booking) => {
-          let currentDate = new Date(booking.dateFrom);
-          const endDate = new Date(booking.dateTo);
-
-          while (currentDate <= endDate) {
-            acc.push(new Date(currentDate));
-            currentDate.setDate(currentDate.getDate() + 1);
-          }
-          return acc;
-        }, []);
-
-        setUnavailableDates(dates);
-      }
-    };
-
-    loadBookings();
-  }, [token, venueId]);
+  }, [bookings]);
 
   const handleBookingSubmit = () => {
     if (!token) {
       alert("Please log in to make a booking");
       return;
     }
-    bookingMutation.mutate({ dateFrom, dateTo, guests, venueId });
+    const newBooking = {
+      dateFrom: startDate,
+      dateTo: endDate,
+      guests,
+      venueId,
+    };
+    createBooking(newBooking, {
+      onSuccess: () => {
+        alert('Booking successfully created');
+        queryClient.invalidateQueries(['bookingsForVenue', venueId]); // Ensure the bookings list is refreshed
+      },
+      onError: (error) => {
+        alert(`Booking creation failed: ${error.message}`);
+      }
+    });
   };
 
-  if (isLoadingBookings) return <div>Loading bookings...</div>;
+  if (isBookingLoading) return <div>Creating booking...</div>;
+  if (bookingError) return <div>Error creating booking: {bookingError.message}</div>;
 
   return (
     <div>
       {venue && <VenueItem data={venue} isDetailedView={true} />}
       <h2>Create a Booking</h2>
       <DatePicker
-      selected={startDate}
-      onChange={([start, end]) => {
-        setStartDate(start);
-        setEndDate(end);
-      }}
-      startDate={startDate}
-      endDate={endDate}
-      excludeDates={unavailableDates}
-      selectsRange
-      inline
-    />
+        selected={startDate}
+        onChange={([start, end]) => {
+          setStartDate(start);
+          setEndDate(end);
+        }}
+        startDate={startDate}
+        endDate={endDate}
+        excludeDates={unavailableDates}
+        selectsRange
+        inline
+      />
       <input type="number" value={guests} onChange={(e) => setGuests(Number(e.target.value))} placeholder="Number of Guests" />
       <button onClick={handleBookingSubmit}>Create Booking</button>
+      <div>
+        <h3>Unavailable for booking during:</h3>
+        {unavailableDates.map((date, index) => (
+          <p key={index}>{date.toLocaleDateString()}</p>
+        ))}
+      </div>
     </div>
   );
 }
