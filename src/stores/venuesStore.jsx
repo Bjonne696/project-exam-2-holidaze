@@ -2,7 +2,7 @@
 
 
 import { create } from 'zustand';
-import { fetchVenuesBatch } from '../utils/fetchVenues'; // Assume this utility function handles fetching
+import { fetchVenuesBatch } from '../hooks/useVenuesApi'; // Assume this utility function handles fetching
 
 const useVenuesStore = create((set, get) => ({
   venues: [],

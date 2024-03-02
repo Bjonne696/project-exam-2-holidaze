@@ -6,51 +6,28 @@ import useAuthStore from '../stores/authStore';
 
 // Assuming fetch functions similar to those in venuesStore are defined here
 
-const fetchVenues = async (offset = 0, limit = 100) => {
-  const response = await fetch(`${BASE_URL}/venues?limit=${limit}&offset=${offset}`, {
-    method: 'GET',
-    headers: {
-      // If your API requires authorization, include the token in the request headers
-      'Authorization': `Bearer ${useAuthStore.getState().token}`,
-    },
-  });
-  if (!response.ok) throw new Error('Failed to fetch venues');
-  return response.json();
-};
+const fetchVenuesBatch = async (offset, limit = 100) => {
+  try {
+    const token = useAuthStore.getState().token; // Get token if needed
+    const response = await fetch(`${BASE_URL}/venues?limit=${limit}&offset=${offset}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        // Include the Authorization header if your API requires it
+        'Authorization': `Bearer ${token}`,
+      },
+    });
 
-const useFetchVenues = () => {
-  const [offset, setOffset] = useState(0);
-  const [allVenues, setAllVenues] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
 
-  useEffect(() => {
-    const loadVenues = async () => {
-      try {
-        setIsLoading(true);
-        let venues = [];
-        let hasMore = true;
-        
-        while (hasMore) {
-          const newVenues = await fetchVenues(offset);
-          venues = [...venues, ...newVenues];
-          setOffset(offset + newVenues.length);
-          hasMore = newVenues.length > 0;
-          if (!hasMore) break; // Exit loop if an empty array is received
-        }
-
-        setAllVenues(venues);
-      } catch (error) {
-        setError(error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    loadVenues();
-  }, []); // Empty dependency array ensures this runs once on mount
-
-  return { data: allVenues, isLoading, error };
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Failed to fetch venues:", error);
+    throw error; // Rethrow error to be handled by the caller
+  }
 };
 
 
@@ -170,7 +147,7 @@ const useFetchManagedVenues = (name, token) => {
   };  
 
   export {
-    useFetchVenues,
+    fetchVenuesBatch,
     useCreateVenue,
     useFetchVenueById,
     useFetchManagedVenues,  // Corrected export
