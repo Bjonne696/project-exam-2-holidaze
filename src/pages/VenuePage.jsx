@@ -7,8 +7,8 @@ import { useQueryClient } from '@tanstack/react-query';
 import useAuthStore from '../stores/authStore';
 import 'react-datepicker/dist/react-datepicker.css';
 import VenueItem from '../components/venues/VenueItem';
-import { useFetchBookingsForVenue, useCreateBooking } from '../hooks/useBookingsApi'; // Correct imports for bookings
-import { useFetchVenueById } from '../hooks/useVenuesApi'; // Corrected import, assuming you have a hook for fetching venue details
+import { useFetchBookingsForVenue, useCreateBooking } from '../hooks/useBookingsApi';
+import { useFetchVenueById } from '../hooks/useVenuesApi';
 
 function VenuePage() {
   const { id: venueId } = useParams();
@@ -16,7 +16,7 @@ function VenuePage() {
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(null);
   const queryClient = useQueryClient();
-  const { token } = useAuthStore((state) => state.token);
+  const token = useAuthStore(state => state.token); // Safe access to token
   
   // Fetch venue details
   const { data: venue } = useFetchVenueById(venueId);
@@ -52,7 +52,7 @@ function VenuePage() {
       dateFrom: startDate,
       dateTo: endDate,
       guests,
-      venueId
+      venueId,
     };
     createBooking(newBooking, {
       onSuccess: () => {
