@@ -2,14 +2,16 @@
 
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useRegisterUser } from '../hooks/useAuthHooks'; // Import the useRegisterUser hook
+import { useRegisterUser } from '../hooks/useAuthHooks';
 import useAuthStore from '../stores/authStore';
 
 const RegisterPage = () => {
+  // Add `avatar` field to the initial form state
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     password: '',
+    avatar: '', // Add avatar field
     venueManager: false,
   });
 
@@ -34,7 +36,6 @@ const RegisterPage = () => {
 
   return (
     <>
-      {/* Display error message if registration fails */}
       {isError && <div className="alert alert-error shadow-lg">
         <div>
           <span>Error during registration:</span> {error?.message || 'An unknown error occurred'}
@@ -45,6 +46,7 @@ const RegisterPage = () => {
         <input type="text" name="name" value={formData.name} onChange={handleChange} placeholder="Name" className="input input-bordered" />
         <input type="email" name="email" value={formData.email} onChange={handleChange} placeholder="Email" className="input input-bordered" />
         <input type="password" name="password" value={formData.password} onChange={handleChange} placeholder="Password" className="input input-bordered" />
+        <input type="text" name="avatar" value={formData.avatar} onChange={handleChange} placeholder="Avatar URL (optional)" className="input input-bordered" />
         <label className="label cursor-pointer">
           <span className="label-text">Are you a venue manager?</span>
           <input type="checkbox" name="venueManager" checked={formData.venueManager} onChange={handleChange} className="checkbox" />
