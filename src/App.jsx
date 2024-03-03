@@ -1,4 +1,4 @@
-// project-exam-2-holidaze/src/App.jsx
+
 
 import { Routes, Route } from 'react-router-dom';
 import Layout from "./components/layout/Layout";

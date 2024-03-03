@@ -1,19 +1,17 @@
-// project-exam-2-holidaze/src/hooks/useVenuesApi.jsx
+
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState, useEffect } from 'react';
 import BASE_URL from '../constants/api';
 import useAuthStore from '../stores/authStore'; 
 
-// Assuming fetch functions similar to those in venuesStore are defined here
-
 const fetchVenuesBatch = async (offset, limit = 100) => {
   try {
-    const token = useAuthStore.getState().token; // Get token if needed
+    const token = useAuthStore.getState().token; 
     const response = await fetch(`${BASE_URL}/venues?limit=${limit}&offset=${offset}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        // Include the Authorization header if your API requires it
+      
         'Authorization': `Bearer ${token}`,
       },
     });
@@ -26,7 +24,7 @@ const fetchVenuesBatch = async (offset, limit = 100) => {
     return data;
   } catch (error) {
     console.error("Failed to fetch venues:", error);
-    throw error; // Rethrow error to be handled by the caller
+    throw error; 
   }
 };
 
@@ -35,7 +33,7 @@ const useCreateVenue = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (venueData) => {
-      const token = localStorage.getItem('token'); // Retrieve the auth token
+      const token = localStorage.getItem('token'); 
       const response = await fetch(`${BASE_URL}/venues`, {
         method: 'POST',
         headers: {
@@ -61,10 +59,9 @@ const useCreateVenue = () => {
 
 
 
-// Fetch a single venue by ID
-// Adjusted to fetch a single venue by ID including its bookings
+
 const useFetchVenueById = (venueId) => {
-  // Adjust the URL to include the `_bookings` query parameter
+
   const url = `${BASE_URL}/venues/${venueId}?_bookings=true`;
 
   return useQuery({
@@ -74,12 +71,10 @@ const useFetchVenueById = (venueId) => {
       if (!response.ok) throw new Error('Failed to fetch venue with bookings');
       return response.json();
     },
-    enabled: !!venueId, // Ensure the query runs only if venueId is provided
+    enabled: !!venueId, 
   });
 };
 
-
-// Fetch venues managed by a manager
 const useFetchManagedVenues = (name, token) => {
   return useQuery({
     queryKey: ['managedVenues', name],
@@ -96,11 +91,11 @@ const useFetchManagedVenues = (name, token) => {
 
       return response.json();
     },
-    enabled: !!name && !!token, // Only run the query if name and token are truthy
+    enabled: !!name && !!token, 
   });
 };
   
-  // Update a venue
+ 
   const useUpdateVenue = () => {
     const queryClient = useQueryClient();
   
@@ -124,18 +119,18 @@ const useFetchManagedVenues = (name, token) => {
         return response.json();
       },
       onSuccess: () => {
-        // Optionally, you can refetch relevant queries or invalidate specific cache keys
-        queryClient.invalidateQueries('venues'); // Replace 'venues' with your actual query key
+
+        queryClient.invalidateQueries('venues'); 
       },
     });
   };
   
-  // Delete a venue
+
    const useDeleteVenue = () => {
     const queryClient = useQueryClient();
     return useMutation({
       mutationFn: async (venueId) => {
-        const token = localStorage.getItem('token'); // Retrieve the auth token
+        const token = localStorage.getItem('token'); 
         const response = await fetch(`${BASE_URL}/venues/${venueId}`, {
           method: 'DELETE',
           headers: {
@@ -143,22 +138,22 @@ const useFetchManagedVenues = (name, token) => {
           },
         });
         if (!response.ok) throw new Error('Failed to delete venue');
-        return response.ok; // Return true as indication of success
+        return response.ok; 
       },
       onSuccess: () => {
-        queryClient.invalidateQueries(['venues']); // Refresh the list of venues
+        queryClient.invalidateQueries(['venues']); 
       },
     });
   };  
 
-  // Fetch bookings for a specific venue MAYBE BE IN ANOTHER FILE: useBookingsApi.jsx
+
 
 
   export {
     fetchVenuesBatch,
     useCreateVenue,
     useFetchVenueById,
-    useFetchManagedVenues,  // Corrected export
+    useFetchManagedVenues, 
     useUpdateVenue,
     useDeleteVenue,
   };

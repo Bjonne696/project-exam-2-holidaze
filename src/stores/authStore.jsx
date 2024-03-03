@@ -1,4 +1,4 @@
-// project-exam-2-holidaze/src/stores/authStore.jsx
+
 import { create } from 'zustand';
 
 const useAuthStore = create((set) => ({
@@ -6,10 +6,10 @@ const useAuthStore = create((set) => ({
   user: (() => {
     try {
       const user = localStorage.getItem('user');
-      return user ? JSON.parse(user) : null; // Ensure null is returned if user is undefined
+      return user ? JSON.parse(user) : null;
     } catch (e) {
       console.error('Error parsing user from localStorage:', e);
-      return null; // Return null in case of any error
+      return null; 
     }
   })(),
 
@@ -36,7 +36,7 @@ const useAuthStore = create((set) => ({
   },
 }));
 
-// Utility functions
+
 export const isAuthenticated = () => {
   const { token } = useAuthStore.getState();
   return !!token;

@@ -1,6 +1,5 @@
-// project-exam-2-holidaze/src/stores/venuesStore.jsx
 import{ create } from 'zustand';
-import { fetchVenuesBatch } from '../hooks/useVenuesApi'; // Adjust the import path as needed
+import { fetchVenuesBatch } from '../hooks/useVenuesApi'; 
 
 const useVenuesStore = create((set) => ({
   venues: [],
@@ -27,7 +26,7 @@ const useVenuesStore = create((set) => ({
       }
     }
 
-    // Filter out duplicate venues based on their `id`
+   
     const uniqueVenues = Array.from(new Map(allVenues.map(venue => [venue['id'], venue])).values());
 
     set({ venues: uniqueVenues, isLoading: false });

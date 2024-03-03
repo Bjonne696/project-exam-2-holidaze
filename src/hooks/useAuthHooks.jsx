@@ -1,9 +1,8 @@
-// project-exam-2-hollidaze/src/hooks/useAuthHooks.jsx
+
 import useAuthStore from '../stores/authStore';
 import BASE_URL from '../constants/api';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
-// Function to update Zustand store and local storage with user data and token
 const updateAuthState = (data, queryClient) => {
   if (data.accessToken) {
     localStorage.setItem('token', data.accessToken);
@@ -27,7 +26,7 @@ const updateAuthState = (data, queryClient) => {
   }
 };
 
-// Function to register a new user
+
 export const useRegisterUser = () => {
   const queryClient = useQueryClient();
   return useMutation({
@@ -38,7 +37,7 @@ export const useRegisterUser = () => {
         body: JSON.stringify(userData),
       });
       if (!response.ok) {
-        const errorResponse = await response.json(); // Handle JSON error response
+        const errorResponse = await response.json(); 
         throw new Error(errorResponse.message || 'Failed to register');
       }
       return response.json();
@@ -51,7 +50,6 @@ export const useRegisterUser = () => {
   });
 };
 
-// Function to login user
 export const useLoginUser = () => {
   const queryClient = useQueryClient();
   return useMutation({
@@ -72,7 +70,6 @@ export const useLoginUser = () => {
   });
 };
 
-// Function to become venue manager
 export const becomeVenueManager = async (token, name) => {
   const response = await fetch(`${BASE_URL}/profiles/${name}`, {
     method: 'PUT',
@@ -90,8 +87,7 @@ export const becomeVenueManager = async (token, name) => {
 
   return await response.json();
 };
-  
-// Function to revoke venue manager status
+
 export const revokeVenueManagerStatus = async (token, name) => {
   const response = await fetch(`${BASE_URL}/profiles/${name}`, {
     method: 'PUT',
@@ -110,7 +106,6 @@ export const revokeVenueManagerStatus = async (token, name) => {
   return response.json();
 };
 
-// function to update user profile media
 export const useUpdateProfileMedia = () => {
   const queryClient = useQueryClient();
   const { token, setUser } = useAuthStore((state) => ({
@@ -136,7 +131,7 @@ export const useUpdateProfileMedia = () => {
       return response.json();
     },
     onSuccess: (data) => {
-      // Update user in local storage and zustand state
+
       localStorage.setItem('user', JSON.stringify(data));
       setUser(data);
       queryClient.invalidateQueries(['profile']);
@@ -145,7 +140,6 @@ export const useUpdateProfileMedia = () => {
 };
 
 
-// hook to logout user
 export const useLogoutUser = () => {
   const queryClient = useQueryClient();
   return {
@@ -159,7 +153,6 @@ export const useLogoutUser = () => {
   };
 };
 
-// hook to become venue manager  
 export const useBecomeVenueManager = () => {
   const queryClient = useQueryClient();
   const setUser = useAuthStore((state) => state.setUser);
@@ -173,7 +166,7 @@ export const useBecomeVenueManager = () => {
         throw new Error('User information not available.');
       }
 
-      return becomeVenueManager(token, user.name); // Use the locally defined function
+      return becomeVenueManager(token, user.name); 
     },
     onSuccess: (updatedUser) => {
       localStorage.setItem('user', JSON.stringify(updatedUser));
@@ -183,7 +176,7 @@ export const useBecomeVenueManager = () => {
   });
 };
   
-// hook to revoke venue manager status
+
 export const useRevokeVenueManagerStatus = () => {
   const queryClient = useQueryClient();
   const setUser = useAuthStore((state) => state.setUser);
@@ -197,7 +190,7 @@ export const useRevokeVenueManagerStatus = () => {
         throw new Error('User information not available.');
       }
 
-      return revokeVenueManagerStatus(token, user.name); // Use the locally defined function
+      return revokeVenueManagerStatus(token, user.name); 
     },
     onSuccess: (data) => {
       queryClient.setQueryData(['auth', 'user'], data);
