@@ -37,7 +37,10 @@ export const useRegisterUser = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(userData),
       });
-      if (!response.ok) throw new Error('Failed to register');
+      if (!response.ok) {
+        const errorResponse = await response.json(); // Handle JSON error response
+        throw new Error(errorResponse.message || 'Failed to register');
+      }
       return response.json();
     },
     onSuccess: (data) => updateAuthState(data, queryClient),
@@ -106,6 +109,41 @@ export const revokeVenueManagerStatus = async (token, name) => {
 
   return response.json();
 };
+
+// function to update user profile media
+export const useUpdateProfileMedia = () => {
+  const queryClient = useQueryClient();
+  const { token, setUser } = useAuthStore((state) => ({
+    token: state.token,
+    setUser: state.setUser,
+  }));
+
+  return useMutation({
+    mutationFn: async ({ avatar }) => {
+      const user = useAuthStore.getState().user;
+      const response = await fetch(`${BASE_URL}/profiles/${user.name}/media`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({ avatar }),
+      });
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to update avatar');
+      }
+      return response.json();
+    },
+    onSuccess: (data) => {
+      // Update user in local storage and zustand state
+      localStorage.setItem('user', JSON.stringify(data));
+      setUser(data);
+      queryClient.invalidateQueries(['profile']);
+    },
+  });
+};
+
 // ********************************************************************************************************************
 //                          '''''''''''''''''''''HOOKS'''''''''''''''''''''''''
 // ********************************************************************************************************************

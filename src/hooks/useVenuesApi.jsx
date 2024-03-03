@@ -64,15 +64,17 @@ const useCreateVenue = () => {
 // Fetch a single venue by ID
 // Adjusted to fetch a single venue by ID including its bookings
 const useFetchVenueById = (venueId) => {
+  // Adjust the URL to include the `_bookings` query parameter
+  const url = `${BASE_URL}/venues/${venueId}?_bookings=true`;
+
   return useQuery({
-    queryKey: ['venue', venueId, 'withBookings'],
+    queryKey: ['venue', venueId],
     queryFn: async () => {
-      // Updated to include the _bookings query parameter
-      const response = await fetch(`${BASE_URL}/venues/${venueId}?_bookings=true`);
+      const response = await fetch(url);
       if (!response.ok) throw new Error('Failed to fetch venue with bookings');
       return response.json();
     },
-    enabled: !!venueId, // Only run the query if venueId is truthy
+    enabled: !!venueId, // Ensure the query runs only if venueId is provided
   });
 };
 

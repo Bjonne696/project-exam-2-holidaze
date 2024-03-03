@@ -1,41 +1,64 @@
 //project-exam-2-holidaze/src/pages/ProfilePage.jsx
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useFetchUserBookings, useDeleteBooking } from '../hooks/useBookingsApi';
 import useAuthStore from '../stores/authStore';
-import { useBecomeVenueManager, useRevokeVenueManagerStatus } from '../hooks/useAuthHooks';
+import { useBecomeVenueManager, useRevokeVenueManagerStatus, useUpdateProfileMedia } from '../hooks/useAuthHooks';
 
-const formatDate = (dateString) => {
-  const options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', timeZoneName: 'short' };
-  return new Intl.DateTimeFormat('en-US', options).format(new Date(dateString));
-};
-
-function ProfilePage() {
-  const { user, token, logoutUser, setUser } = useAuthStore((state) => ({
+const ProfilePage = () => {
+  const { user, setUser } = useAuthStore((state) => ({
     user: state.user,
-    token: state.token,
-    logoutUser: state.logoutUser,
-    setUser: state.setUser, // Ensure you have a setUser method to update user state
+    setUser: state.setUser,
   }));
-  const { data: bookings, isLoading: isLoadingBookings, error: bookingsError } = useFetchUserBookings({ userName: user?.name, token });
-  const { mutate: deleteBooking } = useDeleteBooking();
-  const { mutate: becomeVenueManager, isError: isBecomeManagerError, error: becomeManagerError } = useBecomeVenueManager();
-  const { mutate: revokeManagerStatus, isError: isRevokeManagerError, error: revokeManagerError } = useRevokeVenueManagerStatus();
+
+  const [newAvatar, setNewAvatar] = useState('');
+  const updateAvatarMutation = useUpdateProfileMedia();
+
+  const { data: bookings, isLoading: isLoadingBookings, error: bookingsError } = useFetchUserBookings({ userName: user?.name, token: user?.token });
+  const deleteBookingMutation = useDeleteBooking();
+  const becomeVenueManagerMutation = useBecomeVenueManager();
+  const revokeManagerStatusMutation = useRevokeVenueManagerStatus();
+
+  const handleAvatarChange = (e) => setNewAvatar(e.target.value);
+
+  const handleSubmitAvatar = () => {
+    updateAvatarMutation.mutate({ avatar: newAvatar }, {
+      onSuccess: (data) => {
+        alert('Avatar updated successfully');
+        setUser(data);
+      },
+      onError: (error) => {
+        alert(`Failed to update avatar: ${error.message}`);
+      },
+    });
+  };
+
+  const handleDeleteBooking = (bookingId) => {
+    deleteBookingMutation.mutate(bookingId, {
+      onSuccess: () => {
+        alert('Booking deleted successfully');
+        // Optionally, refresh bookings list here
+      },
+      onError: (error) => {
+        alert(`Failed to delete booking: ${error.message}`);
+      },
+    });
+  };
 
   const handleBecomeVenueManagerClick = () => {
-    becomeVenueManager({}, {
+    becomeVenueManagerMutation.mutate(null, {
       onSuccess: (updatedUser) => {
-        console.log('You are now a venue manager');
-        setUser(updatedUser); // Update user state to reflect the new venue manager status
+        alert('You are now a venue manager');
+        setUser(updatedUser);
       },
     });
   };
 
   const handleRevokeManagerStatusClick = () => {
-    revokeManagerStatus({}, {
+    revokeManagerStatusMutation.mutate(null, {
       onSuccess: (updatedUser) => {
-        console.log('Venue manager status revoked.');
-        setUser(updatedUser); // Update user state to reflect the revocation of venue manager status
+        alert('Venue manager status revoked.');
+        setUser(updatedUser);
       },
     });
   };
@@ -45,47 +68,32 @@ function ProfilePage() {
 
   return (
     <div className="container mx-auto">
-      <h1 className="text-xl font-bold">Profile Page</h1>
+      <div className="flex justify-between items-center">
+        <h1 className="text-xl font-bold">Profile Page</h1>
+        {user?.avatar && <img src={user.avatar} alt="User Avatar" className="rounded-full w-12 h-12" />}
+      </div>
+
       <div>Name: {user?.name}</div>
       <div>Email: {user?.email}</div>
 
-      {/* Error handling for becoming/rejecting venue manager */}
-      {isBecomeManagerError && <p className="text-red-500">Error: {becomeManagerError.message}</p>}
-      {isRevokeManagerError && <p className="text-red-500">Error: {revokeManagerError.message}</p>}
+      <input type="text" value={newAvatar} onChange={handleAvatarChange} placeholder="New Avatar URL" className="input input-bordered" />
+      <button onClick={handleSubmitAvatar} className="btn">Update Avatar</button>
 
-      {!user?.venueManager && (
-        <button
-          onClick={handleBecomeVenueManagerClick}
-          className="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-        >
-          Become Venue Manager
-        </button>
-      )}
-
-      {user?.venueManager && (
-        <button
-          onClick={handleRevokeManagerStatusClick}
-          className="mt-4 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
-        >
-          Revoke Manager Status
-        </button>
+      {!user?.venueManager ? (
+        <button onClick={handleBecomeVenueManagerClick} className="btn btn-primary">Become Venue Manager</button>
+      ) : (
+        <button onClick={handleRevokeManagerStatusClick} className="btn btn-danger">Revoke Manager Status</button>
       )}
 
       <h2 className="text-lg font-bold mt-4">Your Bookings</h2>
-      {bookings?.length > 0 ? (
+      {bookings && bookings.length > 0 ? (
         bookings.map((booking) => (
           <div key={booking.id} className="mb-4 p-2 border rounded shadow">
-            <div><strong>Booking ID:</strong> {booking.id}</div>
-            <div><strong>From:</strong> {formatDate(booking.dateFrom)}</div>
-            <div><strong>To:</strong> {formatDate(booking.dateTo)}</div>
-            <div><strong>Guests:</strong> {booking.guests}</div>
-            <div><strong>Booked on:</strong> {formatDate(booking.created)}</div>
-            <button 
-              onClick={() => deleteBooking(booking.id)}
-              className="mt-2 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
-            >
-              Delete Booking
-            </button>
+            <p><strong>Booking ID:</strong> {booking.id}</p>
+            <p><strong>From:</strong> {new Date(booking.dateFrom).toLocaleString()}</p>
+            <p><strong>To:</strong> {new Date(booking.dateTo).toLocaleString()}</p>
+            <p><strong>Guests:</strong> {booking.guests}</p>
+            <button onClick={() => handleDeleteBooking(booking.id)} className="btn btn-danger">Delete Booking</button>
           </div>
         ))
       ) : (
@@ -93,6 +101,6 @@ function ProfilePage() {
       )}
     </div>
   );
-}
+};
 
-export default ProfilePage; 
+export default ProfilePage;

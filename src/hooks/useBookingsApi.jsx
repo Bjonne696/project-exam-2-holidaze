@@ -92,26 +92,27 @@ export const useFetchUserBookings = ({ userName, token }) => {
 
 export const useCreateBooking = () => {
   const queryClient = useQueryClient();
-  const { token } = useAuthStore(state => ({ token: state.token })); // Destructure token from useAuthStore
+  const token = useAuthStore((state) => state.token); // Correctly accessing the token from Zustand store
 
+  // Ensure the useMutation hook is correctly called within the custom hook body
   return useMutation({
     mutationFn: (newBooking) => {
-      // Ensure the fetch call includes the Authorization header correctly
+      // The fetch call must be within the mutationFn callback
       return fetch(`${BASE_URL}/bookings`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`, // Use token from useAuthStore
+          'Authorization': `Bearer ${token}`, // Use token from Zustand store
         },
         body: JSON.stringify(newBooking),
       })
-      .then(response => {
+      .then((response) => {
         if (!response.ok) throw new Error('Failed to create booking');
         return response.json();
       });
     },
     onSuccess: () => {
-      // Invalidate and refetch as necessary
+      // Invalidate and refetch queries as needed
       queryClient.invalidateQueries(['bookingsForVenue']);
       queryClient.invalidateQueries(['userBookings']);
     },
