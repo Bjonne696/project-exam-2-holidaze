@@ -1,4 +1,3 @@
-//profile page
 import React, { useState, useEffect } from 'react';
 import { useFetchUserBookings, useDeleteBooking } from '../hooks/useBookingsApi';
 import useAuthStore from '../stores/authStore';
@@ -13,7 +12,7 @@ const ProfilePage = () => {
 
   const [newAvatar, setNewAvatar] = useState('');
   const updateAvatarMutation = useUpdateProfileMedia();
-  const revokeManagerStatusMutation = useRevokeVenueManagerStatus(); // Ensure you're invoking this hook
+  const revokeManagerStatusMutation = useRevokeVenueManagerStatus(); 
 
   const { data: bookings, isLoading: isLoadingBookings, error: bookingsError } = useFetchUserBookings({ userName: user?.name, token });
   const deleteBookingMutation = useDeleteBooking();
@@ -53,7 +52,7 @@ const ProfilePage = () => {
     });
   };
 
-  // Define handleRevokeManagerStatusClick here
+ 
   const handleRevokeManagerStatusClick = () => {
     revokeManagerStatusMutation.mutate(null, {
       onSuccess: (updatedUser) => {
