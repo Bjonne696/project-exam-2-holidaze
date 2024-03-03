@@ -49,7 +49,7 @@ const VenueItem = ({ data, isDetailedView = false, showActions = false, onDelete
 
   // Add buttons if showActions is true
   return (
-    <Card className="flex flex-col min-h-[360px] w-[280px] overflow-hidden">
+    <Card className="bg-card-background flex flex-col min-h-[360px] w-[280px] overflow-hidden">
       {imageContent}
       <div className="p-4 flex-1">
         <h3 className="text-lg font-semibold">{name}</h3>
