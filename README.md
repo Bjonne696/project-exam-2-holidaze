@@ -71,7 +71,6 @@ Tailwind CSS's utility classes are utilized to create a responsive layout that a
 
 ## Future Directions
 
-- **Testing**: Integration of Jest and React Testing Library for unit and integration testing.
 - **Performance Optimization**: Exploration of code splitting and lazy loading for performance improvements.
 - **Feature Expansion**: Potential features include advanced search and filtering, user reviews, and enhanced venue management capabilities.
 
