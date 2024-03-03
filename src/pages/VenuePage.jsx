@@ -1,4 +1,4 @@
-// project-exam-2-holidaze/src/pages/VenuePage.jsx
+
 
 import React, { useState, useEffect } from "react";
 import { useParams } from 'react-router-dom';
@@ -14,7 +14,7 @@ function VenuePage() {
   const { id: venueId } = useParams();
   const [guests, setGuests] = useState(1);
   const [startDate, setStartDate] = useState(new Date());
-  const [endDate, setEndDate] = useState(new Date().setDate(new Date().getDate() + 1)); // Default to tomorrow
+  const [endDate, setEndDate] = useState(new Date().setDate(new Date().getDate() + 1)); 
   const queryClient = useQueryClient();
   const token = useAuthStore(state => state.token);
   const { data: venue, isLoading: venueLoading, error: venueError } = useFetchVenueById(venueId);
@@ -22,7 +22,7 @@ function VenuePage() {
   const createBookingMutation = useCreateBooking();
 
   useEffect(() => {
-    // Calculate unavailable dates based on venue bookings
+   
     const dates = venue?.bookings?.reduce((acc, booking) => {
       let currentDate = new Date(booking.dateFrom);
       const endDate = new Date(booking.dateTo);

@@ -17,8 +17,7 @@ const VenueItem = ({ data, isDetailedView = false, showActions = false, onDelete
     });
   };
 
-  // Note the addition of responsive margin utilities: `my-2 sm:my-4`
-  // This applies a smaller margin on small screens and a larger margin on wider screens.
+
   return (
     <div className="bg-card-background shadow-lg rounded-lg overflow-hidden my-2 sm:my-4 p-4">
       {media.length > 0 && !imageError ? (

@@ -38,7 +38,7 @@ function ManagerProfilePage() {
         <button onClick={handleRevokeManager} className={`${buttonStyle} btn-warning`}>
           Revoke Venue Manager Status
         </button>
-        {/* Changed the button color to match the "Revoke Venue Manager Status" button */}
+
         <Link to="/create-venue" className={`${buttonStyle} btn-warning`}>
           Add New Venue
         </Link>

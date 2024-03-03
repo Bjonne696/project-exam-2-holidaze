@@ -1,9 +1,8 @@
-// src/hooks/useBookingsApi.js
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import BASE_URL from '../constants/api';
 import useAuthStore from '../stores/authStore';
 
-// Function to fetch bookings for a specific venue
+
 const fetchBookingsForVenue = async (venueId, token) => {
   const response = await fetch(`${BASE_URL}/venues/${venueId}?_bookings`, {
     headers: {
@@ -14,9 +13,9 @@ const fetchBookingsForVenue = async (venueId, token) => {
   return response.json();
 };
 
-// Function to fetch bookings for a user
+
 const fetchUserBookings = async (userName, token) => {
-  const response = await fetch(`${BASE_URL}/profiles/${userName}/bookings?_venue=true`, { // Include _venue query parameter
+  const response = await fetch(`${BASE_URL}/profiles/${userName}/bookings?_venue=true`, { 
     headers: {
       'Authorization': `Bearer ${token}`,
     },
@@ -28,13 +27,13 @@ const fetchUserBookings = async (userName, token) => {
   return response.json();
 };
 
-// Function to create a booking
+
 const createBooking = async (bookingData, token) => {
   const response = await fetch(`${BASE_URL}/bookings`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      // Ensure the token is correctly included in the authorization header
+
       'Authorization': `Bearer ${token}`,
     },
     body: JSON.stringify(bookingData),
@@ -43,7 +42,7 @@ const createBooking = async (bookingData, token) => {
   return response.json();
 };
 
-// Function to update a booking
+
 const updateBooking = async (bookingId, updateData, token) => {
     const response = await fetch(`${BASE_URL}/bookings/${bookingId}`, {
       method: 'PUT',
@@ -57,7 +56,6 @@ const updateBooking = async (bookingId, updateData, token) => {
     return response.json();
   };
 
-// Function to delete a booking
 const deleteBooking = async (bookingId, token) => {
     const response = await fetch(`${BASE_URL}/bookings/${bookingId}`, {
       method: 'DELETE',
@@ -66,7 +64,7 @@ const deleteBooking = async (bookingId, token) => {
       },
     });
     if (!response.ok) throw new Error('Failed to delete booking');
-    return response.ok; // Return true as indication of success
+    return response.ok; 
   };
 
 
@@ -88,17 +86,16 @@ export const useFetchUserBookings = ({ userName, token }) => {
 
 export const useCreateBooking = () => {
   const queryClient = useQueryClient();
-  const token = useAuthStore((state) => state.token); // Correctly accessing the token from Zustand store
-
-  // Ensure the useMutation hook is correctly called within the custom hook body
+  const token = useAuthStore((state) => state.token); 
+ 
   return useMutation({
     mutationFn: (newBooking) => {
-      // The fetch call must be within the mutationFn callback
+      
       return fetch(`${BASE_URL}/bookings`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`, // Use token from Zustand store
+          'Authorization': `Bearer ${token}`, 
         },
         body: JSON.stringify(newBooking),
       })
@@ -108,7 +105,7 @@ export const useCreateBooking = () => {
       });
     },
     onSuccess: () => {
-      // Invalidate and refetch queries as needed
+
       queryClient.invalidateQueries(['bookingsForVenue']);
       queryClient.invalidateQueries(['userBookings']);
     },
@@ -118,26 +115,26 @@ export const useCreateBooking = () => {
 
 export const useUpdateBooking = () => {
   const queryClient = useQueryClient();
-  const token = localStorage.getItem('token'); // or retrieve it from your auth state/store
+  const token = localStorage.getItem('token');
 
   return useMutation({
     mutationFn: ({ bookingId, updateData }) => updateBooking(bookingId, updateData, token),
     onSuccess: () => {
-      // Here you should specify the exact queries to be invalidated
+     
       queryClient.invalidateQueries({ queryKey: ['bookingsForVenue'] });
       queryClient.invalidateQueries({ queryKey: ['userBookings'] });
     },
   });
 };
-// React Query Hook for deleting a booking
+
 export const useDeleteBooking = () => {
   const queryClient = useQueryClient();
-  const token = localStorage.getItem('token'); // or retrieve it from your auth state/store
+  const token = localStorage.getItem('token'); 
 
   return useMutation({
     mutationFn: (bookingId) => deleteBooking(bookingId, token),
     onSuccess: () => {
-      // Invalidate specific queries to refresh data as needed
+
       queryClient.invalidateQueries({ queryKey: ['bookingsForVenue'] });
       queryClient.invalidateQueries({ queryKey: ['userBookings'] });
     },
