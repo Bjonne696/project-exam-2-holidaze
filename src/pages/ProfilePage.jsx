@@ -90,18 +90,19 @@ const ProfilePage = () => {
 
       <h2 className="text-lg font-bold mt-4">Your Bookings</h2>
       {bookings && bookings.length > 0 ? (
-        bookings.map((booking) => (
-          <div key={booking.id} className="mb-4 p-2 border rounded shadow">
-            <p><strong>Booking ID:</strong> {booking.id}</p>
-            <p><strong>From:</strong> {new Date(booking.dateFrom).toLocaleString()}</p>
-            <p><strong>To:</strong> {new Date(booking.dateTo).toLocaleString()}</p>
-            <p><strong>Guests:</strong> {booking.guests}</p>
-            <button onClick={() => handleDeleteBooking(booking.id)} className="btn btn-danger">Delete Booking</button>
-          </div>
-        ))
-      ) : (
-        <p>You have no bookings.</p>
-      )}
+  bookings.map((booking) => (
+    <div key={booking.id} className="mb-4 p-2 border rounded shadow">
+      {/* Ensure the data structure matches your API response */}
+      <p><strong>Venue:</strong> {booking.venue?.name}</p>
+      <p><strong>From:</strong> {new Date(booking.dateFrom).toLocaleString()}</p>
+      <p><strong>To:</strong> {new Date(booking.dateTo).toLocaleString()}</p>
+      <p><strong>Guests:</strong> {booking.guests}</p>
+      <button onClick={() => handleDeleteBooking(booking.id)} className="btn btn-danger">Delete Booking</button>
+    </div>
+  ))
+) : (
+  <p>You have no bookings.</p>
+)}
     </div>
   );
 };
