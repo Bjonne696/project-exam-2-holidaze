@@ -35,7 +35,7 @@ const VenueItem = ({ data, isDetailedView = false, showActions = false, onDelete
   };
 
   return (
-    <div className="bg-card-background shadow-2xl rounded-lg overflow-hidden my-4" style={{ minHeight: '350px' }}>
+    <div className="bg-card-background shadow-lg rounded-lg overflow-hidden my-4 p-4 sm:p-2">
       <div className="flex justify-center items-center h-52">
         {media.length > 0 && !imageError ? (
           <img src={media[0]} alt={name} onError={() => setImageError(true)} className="object-cover w-full h-full" />
