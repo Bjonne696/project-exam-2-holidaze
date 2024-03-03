@@ -3,24 +3,22 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { Card } from 'react-daisyui';
-import { Link, useNavigate } from 'react-router-dom';
-import { useDeleteVenue } from '../../hooks/useVenuesApi'; // Import the useDeleteVenue hook
+import { useNavigate } from 'react-router-dom';
+import { useDeleteVenue } from '../../hooks/useVenuesApi';
 
 const VenueItem = ({ data, isDetailedView = false, showActions = false, onDeleteClick }) => {
   const { name, description, media, rating, maxGuests, price, created, updated } = data;
   const [imageError, setImageError] = useState(false);
   const navigate = useNavigate();
-  const deleteVenue = useDeleteVenue(); // Adjusted to use React Query hook
-  
+  const deleteVenue = useDeleteVenue();
+
   const handleDelete = () => {
     deleteVenue.mutate(data.id, {
       onSuccess: () => {
-        // Optionally, trigger a refetch or use onDeleteClick as a callback to refresh the list
         onDeleteClick && onDeleteClick();
       },
     });
   };
-
 
   const imageSrc = media.length > 0 ? media[0] : null;
   const imageContent = imageSrc && !imageError ? (
@@ -29,51 +27,38 @@ const VenueItem = ({ data, isDetailedView = false, showActions = false, onDelete
     <h2 className="text-lg font-semibold">No image found</h2>
   );
 
-  if (isDetailedView) {
-    return (
-      <div className="bg-white shadow-lg rounded-lg overflow-hidden">
-        {imageContent}
-        <div className="p-4">
-          <h2 className="text-xl font-bold">{name}</h2>
-          <p className="mt-2 text-gray-600">{description}</p>
-          <p className="mt-2"><span className="font-bold">Rating:</span> {rating} ★</p>
-          <p><span className="font-bold">Max Guests:</span> {maxGuests}</p>
-          <p><span className="font-bold">Price:</span> ${price}</p>
-          <p><span className="font-bold">Created:</span> {new Date(created).toLocaleDateString()}</p>
-          <p><span className="font-bold">Updated:</span> {new Date(updated).toLocaleDateString()}</p>
-          {/* Render additional details as needed */}
-        </div>
-      </div>
-    );
-  }
+  const buttonStyle = {
+    borderColor: '#810f0f', 
+    borderWidth: '3px', 
+    borderStyle: 'solid', 
+    borderRadius: '25px',
+  };
 
-  // Add buttons if showActions is true
   return (
-    <Card className="flex flex-col min-h-[360px] w-[280px] overflow-hidden">
-      {imageContent}
-      <div className="p-4 flex-1">
-        <h3 className="text-lg font-semibold">{name}</h3>
-        <p className="mt-2"><span className="font-bold">Rating:</span> {rating} ★</p>
-          <p><span className="font-bold">Max Guests:</span> {maxGuests}</p>
-          <p><span className="font-bold">Price:</span> ${price}</p>
-        {showActions && (
-          <div className="flex justify-between mt-4">
-            <button
-              className="btn btn-primary"
-              onClick={() => navigate(`/update-venue/${data.id}`)}
-            >
-              Update
-            </button>
-            <button
-              className="btn btn-error"
-              onClick={handleDelete}
-            >
-              Delete
-            </button>
-          </div>
+    <div className="bg-card-background shadow-2xl rounded-lg overflow-hidden my-4" style={{ minHeight: '350px' }}>
+      <div className="flex justify-center items-center h-52">
+        {media.length > 0 && !imageError ? (
+          <img src={media[0]} alt={name} onError={() => setImageError(true)} className="object-cover w-full h-full" />
+        ) : (
+          <div className="text-lg font-semibold">No image found</div>
         )}
       </div>
-    </Card>
+      <div className="p-4">
+        <h2 className="text-xl font-bold">{name}</h2>
+        <p className="mt-2 text-gray-600">Price:{price}</p>
+        <p className="mt-2 text-gray-600">Max Guests:{maxGuests}</p>
+        <p className="mt-2 text-gray-600">Rating:{rating}</p>
+        <div className="flex justify-between mt-4">
+          {showActions && (
+            <>
+              <p className="mt-2 text-gray-600">{description}</p>
+              <button className="btn btn-primary" onClick={() => navigate(`/update-venue/${data.id}`)}>Update</button>
+              <button className="btn btn-error" onClick={handleDelete}>Delete</button>
+            </>
+          )}
+        </div>
+      </div>
+    </div>
   );
 };
 

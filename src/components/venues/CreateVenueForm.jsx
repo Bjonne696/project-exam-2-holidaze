@@ -93,7 +93,7 @@ const CreateVenueForm = () => {
 
 
   return (
-    <div>
+    <div className="bg-page-background p-4 rounded-lg shadow-md">
       <h2>Add New Venue</h2>
       <form onSubmit={handleSubmit}>
         {/* Venue Name */}

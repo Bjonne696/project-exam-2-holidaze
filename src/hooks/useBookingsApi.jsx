@@ -16,7 +16,7 @@ const fetchBookingsForVenue = async (venueId, token) => {
 
 // Function to fetch bookings for a user
 const fetchUserBookings = async (userName, token) => {
-  const response = await fetch(`${BASE_URL}/profiles/${userName}/bookings`, {
+  const response = await fetch(`${BASE_URL}/profiles/${userName}/bookings?_venue=true`, { // Include _venue query parameter
     headers: {
       'Authorization': `Bearer ${token}`,
     },
@@ -69,10 +69,6 @@ const deleteBooking = async (bookingId, token) => {
     return response.ok; // Return true as indication of success
   };
 
-
-// ********************************************************************************************************************
-//                          '''''''''''''''''''''HOOKS'''''''''''''''''''''''''
-// ********************************************************************************************************************
 
 export const useFetchBookingsForVenue = ({ venueId, token }) => {
   return useQuery({

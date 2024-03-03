@@ -67,7 +67,7 @@ const UpdateVenueForm = () => {
   };
 
   return (
-      <div className="container mx-auto my-8">
+      <div className="container mx-auto my-8 bg-page-background p-4 rounded-lg shadow-md">
         <h2 className="text-xl font-bold mb-4">Update Venue</h2>
         <form onSubmit={handleSubmit} className="space-y-4">
         {/* Venue Name */}
