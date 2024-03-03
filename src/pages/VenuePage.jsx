@@ -1,5 +1,3 @@
-
-
 import React, { useState, useEffect } from "react";
 import { useParams } from 'react-router-dom';
 import DatePicker from "react-datepicker";
@@ -66,7 +64,7 @@ function VenuePage() {
 
   return (
     <div>
-      {venue && <VenueItem data={venue} isDetailedView={true} />}
+      {venue && <VenueItem data={venue} isDetailedView={true} />} {/* Removed hideDescription prop */}
       <h2>Create a Booking</h2>
       <DatePicker
         selected={startDate}
