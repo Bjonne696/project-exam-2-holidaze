@@ -7,45 +7,41 @@ import { useQueryClient } from '@tanstack/react-query';
 import useAuthStore from '../stores/authStore';
 import 'react-datepicker/dist/react-datepicker.css';
 import VenueItem from '../components/venues/VenueItem';
-import { useFetchBookingsForVenue, useCreateBooking } from '../hooks/useBookingsApi';
+import { useCreateBooking } from '../hooks/useBookingsApi';
 import { useFetchVenueById } from '../hooks/useVenuesApi';
 
 function VenuePage() {
   const { id: venueId } = useParams();
   const [guests, setGuests] = useState(1);
   const [startDate, setStartDate] = useState(new Date());
-  const [endDate, setEndDate] = useState(null);
+  const [endDate, setEndDate] = useState(new Date().setDate(new Date().getDate() + 1)); // Default to tomorrow
   const queryClient = useQueryClient();
-  const token = useAuthStore(state => state.token); // Safe access to token
-  
-  // Fetch venue details
-  const { data: venue } = useFetchVenueById(venueId);
-
-  // Fetch bookings for venue to determine unavailable dates
-  const { data: bookings } = useFetchBookingsForVenue(venueId, token);
+  const token = useAuthStore(state => state.token);
+  const { data: venue, isLoading: venueLoading, error: venueError } = useFetchVenueById(venueId);
   const [unavailableDates, setUnavailableDates] = useState([]);
-
-  const { mutate: createBooking, isLoading: isBookingLoading, error: bookingError } = useCreateBooking();
+  const createBookingMutation = useCreateBooking();
 
   useEffect(() => {
-    // Calculate unavailable dates based on bookings
-    if (bookings) {
-      const dates = bookings.reduce((acc, booking) => {
-        let currentDate = new Date(booking.dateFrom);
-        const endDate = new Date(booking.dateTo);
-        while (currentDate <= endDate) {
-          acc.push(new Date(currentDate));
-          currentDate.setDate(currentDate.getDate() + 1);
-        }
-        return acc;
-      }, []);
-      setUnavailableDates(dates);
-    }
-  }, [bookings]);
+    // Calculate unavailable dates based on venue bookings
+    const dates = venue?.bookings?.reduce((acc, booking) => {
+      let currentDate = new Date(booking.dateFrom);
+      const endDate = new Date(booking.dateTo);
+      while (currentDate <= endDate) {
+        acc.push(new Date(currentDate));
+        currentDate.setDate(currentDate.getDate() + 1);
+      }
+      return acc;
+    }, []);
+    setUnavailableDates(dates);
+  }, [venue?.bookings]);
 
   const handleBookingSubmit = () => {
     if (!token) {
       alert("Please log in to make a booking");
+      return;
+    }
+    if (!endDate) {
+      alert("Please select an end date for your booking.");
       return;
     }
     const newBooking = {
@@ -54,10 +50,10 @@ function VenuePage() {
       guests,
       venueId,
     };
-    createBooking(newBooking, {
+    createBookingMutation.mutate(newBooking, {
       onSuccess: () => {
         alert('Booking successfully created');
-        queryClient.invalidateQueries(['bookingsForVenue', venueId]); // Ensure the bookings list is refreshed
+        queryClient.invalidateQueries(['venue', venueId]);
       },
       onError: (error) => {
         alert(`Booking creation failed: ${error.message}`);
@@ -65,8 +61,8 @@ function VenuePage() {
     });
   };
 
-  if (isBookingLoading) return <div>Creating booking...</div>;
-  if (bookingError) return <div>Error creating booking: {bookingError.message}</div>;
+  if (venueLoading) return <div>Loading...</div>;
+  if (venueError) return <div>Error loading venue details: {venueError.message}</div>;
 
   return (
     <div>
@@ -86,14 +82,22 @@ function VenuePage() {
       />
       <input type="number" value={guests} onChange={(e) => setGuests(Number(e.target.value))} placeholder="Number of Guests" />
       <button onClick={handleBookingSubmit}>Create Booking</button>
-      <div>
-        <h3>Unavailable for booking during:</h3>
-        {unavailableDates.map((date, index) => (
-          <p key={index}>{date.toLocaleDateString()}</p>
-        ))}
+      <div className="my-8">
+        <h2 className="text-xl font-bold">Unavailable for booking during these dates:</h2>
+        {venue?.bookings && venue.bookings.length > 0 ? (
+          <ul>
+            {venue.bookings.map((booking) => (
+              <li key={booking.id} className="my-2">
+                {new Date(booking.dateFrom).toLocaleDateString()} to {new Date(booking.dateTo).toLocaleDateString()} - {booking.guests} guests
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p>No bookings found for this venue.</p>
+        )}
       </div>
     </div>
   );
-}
+};
 
 export default VenuePage;
