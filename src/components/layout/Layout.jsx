@@ -1,70 +1,69 @@
 // project-exam-2-hollidaze/src/components/layout/Layout.jsx
 
 import React, { useEffect } from 'react';
-import { Button, Menu, Navbar } from "react-daisyui";
-import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
-import useAuthStore from '../../stores/authStore'; // Adjusted import
+import { NavLink, Outlet, useNavigate } from "react-router-dom";
+import useAuthStore from '../../stores/authStore';
+import heroBanner from '../../assets/logo.png'; // Importing the hero banner image
 
 function Layout() {
   const { logoutUser, token, user } = useAuthStore(state => ({
     logoutUser: state.logoutUser,
     token: state.token,
-    user: state.user, // Accessing the user object from the store
+    user: state.user,
   }));
   const navigate = useNavigate();
 
-  const isAuthenticated = !!token; // Determine if user is authenticated
-  const isVenueManager = user?.venueManager; // Determine if user is a venue manager
+  const isAuthenticated = !!token;
+  const isVenueManager = user?.venueManager;
 
   useEffect(() => {
-    // Log authentication status and venue manager status
     console.log(`Logged in: ${isAuthenticated}`);
     console.log(`Venue Manager: ${isVenueManager}`);
-  }, [isAuthenticated, isVenueManager]); // Dependency array includes both states
+  }, [isAuthenticated, isVenueManager]);
 
   return (
     <>
-      <Navbar>
-        <div className="flex-1">
-          <Button tag={Link} to="/" className="text-xl normal-case" color="ghost">
-            Logo
-          </Button>
-        </div>
-        
-        <div className="flex-none">
-          <Menu horizontal={true} className="px-1">
-            <Menu.Item>
-              <NavLink to="/">Home</NavLink>
-            </Menu.Item>
+      <div className="flex flex-col items-center bg-page-background h-[30vh] relative">
+        {/* Hero Banner Image */}
+        <img src={heroBanner} alt="Hero Banner" style={{ left: '74%' }} className="absolute h-full object-cover" />
+
+        <div className="w-full flex flex-col items-center justify-end h-full space-y-2 pb-4 z-10">
+          {/* Holidaze Title */}
+          <h1 className="text-4xl font-bold text-gray-800">Holidaze</h1>
+
+          {/* Navigation Buttons */}
+          <div className="space-y-2">
+            <NavLink to="/" className="bg-card-background rounded-full border-5 border-custom text-center px-4 py-2">
+              Home
+            </NavLink>
             {isVenueManager && (
-              <Menu.Item>
-                <NavLink to="/manager-profile">Manager Dashboard</NavLink>
-              </Menu.Item>
+              <NavLink to="/manager-profile" className="bg-card-background rounded-full border-5 border-custom text-center px-4 py-2">
+                Manager Dashboard
+              </NavLink>
             )}
-            {/* Conditional rendering based on isAuthenticated */}
             {isAuthenticated ? (
               <>
-                <Menu.Item>
-                  <button onClick={logoutUser} className="btn btn-secondary">Logout</button>
-                </Menu.Item>
-                <Menu.Item>
-                  <NavLink to="/profile">Profile</NavLink>
-                </Menu.Item>
+                <button onClick={logoutUser} className="bg-card-background rounded-full border-5 border-custom text-center px-4 py-2">
+                  Logout
+                </button>
+                <NavLink to="/profile" className="bg-card-background rounded-full border-5 border-custom text-center px-4 py-2">
+                  Profile
+                </NavLink>
               </>
             ) : (
               <>
-                <Menu.Item>
-                  <Link to="/login" className="btn btn-primary">Login</Link>
-                </Menu.Item>
-                <Menu.Item>
-                  <Link to="/register" className="btn btn-secondary">Register</Link>
-                </Menu.Item>
+                <NavLink to="/login" className="bg-card-background rounded-full border-5 border-custom text-center px-4 py-2">
+                  Login
+                </NavLink>
+                <NavLink to="/register" className="bg-card-background rounded-full border-5 border-custom text-center px-4 py-2">
+                  Register
+                </NavLink>
               </>
             )}
-          </Menu>
+          </div>
         </div>
-      </Navbar>
-      <div className="container mx-auto">
+      </div>
+      <div className="container mx-auto mt-4">
         <Outlet />
       </div>
     </>
