@@ -6,15 +6,18 @@ import useAuthStore from '../stores/authStore';
 import { useBecomeVenueManager, useRevokeVenueManagerStatus, useUpdateProfileMedia } from '../hooks/useAuthHooks';
 
 const ProfilePage = () => {
-  const { user, setUser } = useAuthStore((state) => ({
+  // Directly accessing token from useAuthStore
+  const { user, token, setUser } = useAuthStore((state) => ({
     user: state.user,
+    token: state.token, // Accessing token directly from the store
     setUser: state.setUser,
   }));
+
 
   const [newAvatar, setNewAvatar] = useState('');
   const updateAvatarMutation = useUpdateProfileMedia();
 
-  const { data: bookings, isLoading: isLoadingBookings, error: bookingsError } = useFetchUserBookings({ userName: user?.name, token: user?.token });
+  const { data: bookings, isLoading: isLoadingBookings, error: bookingsError } = useFetchUserBookings({ userName: user?.name, token });
   const deleteBookingMutation = useDeleteBooking();
   const becomeVenueManagerMutation = useBecomeVenueManager();
   const revokeManagerStatusMutation = useRevokeVenueManagerStatus();
