@@ -1,12 +1,10 @@
-// project-exam-2-holidaze/src/components/venues/CreateVenueForm.jsx
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useCreateVenue } from '../../hooks/useVenuesApi'; // Import the useCreateVenue hook
+import { useCreateVenue } from '../../hooks/useVenuesApi'; 
 
 const CreateVenueForm = () => {
   const navigate = useNavigate();
-  const { mutate: createVenue, error, isLoading } = useCreateVenue(); // Use the React Query hook
+  const { mutate: createVenue, error, isLoading } = useCreateVenue(); 
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -34,9 +32,9 @@ const CreateVenueForm = () => {
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
 
-    // Special handling for media URLs, assuming comma-separated values
+
     if (name === 'media') {
-      const mediaUrls = value.split(',').map(url => url.trim()); // Split by comma and trim whitespace
+      const mediaUrls = value.split(',').map(url => url.trim()); 
       setFormData(prevState => ({
         ...prevState,
         media: mediaUrls,
@@ -62,13 +60,12 @@ const CreateVenueForm = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
   
-    // Convert price and maxGuests to numbers
+
     const submissionData = {
       ...formData,
       price: parseFloat(formData.price),
       maxGuests: parseInt(formData.maxGuests, 10),
-      rating: parseFloat(formData.rating), // Ensure rating is a float
-      // Ensure lat and lng are floats if they are not empty
+      rating: parseFloat(formData.rating),
       location: {
         ...formData.location,
         lat: formData.location.lat ? parseFloat(formData.location.lat) : 0,
@@ -94,65 +91,63 @@ const CreateVenueForm = () => {
 
   return (
     <div className="bg-page-background p-4 rounded-lg shadow-md">
-      <h2>Add New Venue</h2>
-      <form onSubmit={handleSubmit}>
-        {/* Venue Name */}
-        <div>
-          <label>Venue Name:</label>
+      <h2 className="text-xl font-bold mb-4">Add New Venue</h2>
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="flex flex-col">
+          <label className="text-gray-600">Venue Name:</label>
           <input
             type="text"
             name="name"
             value={formData.name}
             onChange={handleChange}
             required
+            className="input input-bordered"
           />
         </div>
-        {/* Description */}
-        <div>
-          <label>Description:</label>
+        <div className="flex flex-col">
+          <label className="text-gray-600">Description:</label>
           <textarea
             name="description"
             value={formData.description}
             onChange={handleChange}
             required
+            className="input input-bordered"
           />
         </div>
-        {/* Price */}
-        <div>
-          <label>Price:</label>
+        <div className="flex flex-col">
+          <label className="text-gray-600">Price:</label>
           <input
             type="number"
             name="price"
             value={formData.price}
             onChange={handleChange}
             required
+            className="input input-bordered"
           />
         </div>
-        {/* Max Guests */}
-        <div>
-          <label>Max Guests:</label>
+        <div className="flex flex-col">
+          <label className="text-gray-600">Max Guests:</label>
           <input
             type="number"
             name="maxGuests"
             value={formData.maxGuests}
             onChange={handleChange}
             required
+            className="input input-bordered"
           />
         </div>
-        {/* Media URLs */}
-        <div>
-          <label>Media URLs:</label>
+        <div className="flex flex-col">
+          <label className="text-gray-600">Media URLs:</label>
           <input
             type="text"
             name="media"
             placeholder="Enter URLs separated by commas"
-            value={formData.media.join(', ')} // Join array values with comma for display
+            value={formData.media.join(', ')} 
             onChange={handleChange}
+            className="input input-bordered"
           />
         </div>
-        
-        {/* Include inputs for optional fields (media, meta, location) as needed */}
-        <button type="submit">Create Venue</button>
+        <button type="submit" className="btn">Create Venue</button>
       </form>
     </div>
   );

@@ -1,62 +1,103 @@
-// project-exam-2-holidaze/src/pages/RegisterPage.jsx
-
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useRegisterUser } from '../hooks/useAuthHooks';
 import useAuthStore from '../stores/authStore';
 
 const RegisterPage = () => {
-  // Add `avatar` field to the initial form state
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     password: '',
-    avatar: '', // Add avatar field
+    avatar: '',
     venueManager: false,
   });
 
   const navigate = useNavigate();
-  const { mutate: registerUser, isError, error, isLoading } = useRegisterUser(); // Enhanced to use isError for conditional rendering
-
+  const { mutate: registerUser, isError, error, isLoading } = useRegisterUser();
+  
   const handleChange = (e) => {
     const value = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
     setFormData({ ...formData, [e.target.name]: value });
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     registerUser(formData, {
       onSuccess: (data) => {
-        // Assuming `data` contains the accessToken and is correctly handled within your Zustand store's `setToken` action
-        useAuthStore.getState().setToken(data.accessToken); // Update Zustand store with new token
-        navigate('/'); // Redirect to HomePage after successful registration
+        useAuthStore.getState().setToken(data.accessToken);
+        navigate('/');
       },
     });
   };
 
-  return (
-    <>
-      {isError && <div className="alert alert-error shadow-lg">
-        <div>
-          <span>Error during registration:</span> {error?.message || 'An unknown error occurred'}
-        </div>
-      </div>}
+  const buttonStyle = "border border-#810f0f rounded-full text-center px-4 py-2 bg-card-background mx-auto";
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <input type="text" name="name" value={formData.name} onChange={handleChange} placeholder="Name" className="input input-bordered" />
-        <input type="email" name="email" value={formData.email} onChange={handleChange} placeholder="Email" className="input input-bordered" />
-        <input type="password" name="password" value={formData.password} onChange={handleChange} placeholder="Password" className="input input-bordered" />
-        <input type="text" name="avatar" value={formData.avatar} onChange={handleChange} placeholder="Avatar URL (optional)" className="input input-bordered" />
-        <label className="label cursor-pointer">
-          <span className="label-text">Are you a venue manager?</span>
-          <input type="checkbox" name="venueManager" checked={formData.venueManager} onChange={handleChange} className="checkbox" />
-        </label>
-        <button type="submit" className="btn" disabled={isLoading}>Register</button>
-        <p className="text-center mt-4">
-          Already have an account? <Link to="/login" className="text-blue-500 hover:text-blue-700">Log in</Link>
-        </p>
-      </form>
-    </>
+  return (
+    <div className="min-h-screen flex flex-col justify-center items-center">
+      <div className="w-full max-w-md p-8 space-y-4 bg-white rounded-lg shadow-md">
+        {isError && (
+          <div className="alert alert-error shadow-lg">
+            <div>
+              <span>Error during registration:</span> {error?.message || 'An unknown error occurred'}
+            </div>
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <input
+            type="text"
+            name="name"
+            value={formData.name}
+            onChange={handleChange}
+            placeholder="Name"
+            className="input input-bordered w-full"
+            required
+          />
+          <input
+            type="email"
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
+            placeholder="Email"
+            className="input input-bordered w-full"
+            required
+          />
+          <input
+            type="password"
+            name="password"
+            value={formData.password}
+            onChange={handleChange}
+            placeholder="Password"
+            className="input input-bordered w-full"
+            required
+          />
+          <input
+            type="text"
+            name="avatar"
+            value={formData.avatar}
+            onChange={handleChange}
+            placeholder="Avatar URL (optional)"
+            className="input input-bordered w-full"
+          />
+          <label className="flex items-center space-x-2">
+            <input
+              type="checkbox"
+              name="venueManager"
+              checked={formData.venueManager}
+              onChange={handleChange}
+              className="checkbox checkbox-primary"
+            />
+            <span>Are you a venue manager?</span>
+          </label>
+          <button type="submit" className={`btn ${buttonStyle}`} disabled={isLoading}>
+            Register
+          </button>
+          <p className="text-center mt-4">
+            Already have an account? <Link to="/login" className="text-blue-500 hover:text-blue-700">Log in</Link>
+          </p>
+        </form>
+      </div>
+    </div>
   );
 };
 

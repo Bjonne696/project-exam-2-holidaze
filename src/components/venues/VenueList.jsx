@@ -1,4 +1,3 @@
-// project-exam-2-holidaze/src/components/venues/VenueList.jsx
 
 import React from 'react';
 import { Link } from 'react-router-dom';
