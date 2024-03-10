@@ -1,79 +1,70 @@
-# Holidaze Accommodation Booking Site - Technical Documentation
+# Holidaze Accommodation Booking
 
-## Overview
+![image](https://user-images.githubusercontent.com/52622303/164316813-4b12d99f-aeb7-4069-85cf-e72b3a50ac99.png)
 
-Holidaze is a dual-faceted web application designed to facilitate accommodation bookings and venue management. This document delves into the technical architecture, front-end implementation, integration with external APIs, state management, and UI design using Tailwind CSS.
+A simple overview of the use/purpose of the project.
 
-## Project Structure
+## Description
 
-The project adopts a modular architecture, segregating functionalities into components, hooks, pages, and stores for state management. This structure promotes reusability, maintainability, and scalability.
+Add a more detailed description of what your project entails and set out to do.
 
-### Directory Layout
+You can add some bullet points if you'd like to:
 
-- `src/components`: Contains UI components, further categorized into `layout` and `venues` for organizational clarity.
-- `src/pages`: Houses components that represent full pages, serving as the primary entry points for the application's various features.
-- `src/hooks`: Custom React hooks for business logic encapsulation, including API calls and state manipulation.
-- `src/stores`: Implements Zustand for global state management across the application, with distinct stores for authentication, bookings, and venues.
-- `src/constants`: Centralizes configuration values such as the API base URL for easy management and updates.
-- `src/assets`: Static assets like images or icons used across the application.
+- List item 1
+- List item 2
+- List item 3
 
-### Key Files
+## Built With
 
-- `App.jsx`: Defines the routing logic using React Router, mapping URLs to components.
-- `main.jsx`: The entry point for the React application, setting up the React Query client and wrapping the app in necessary providers.
-- `index.html`: The HTML template for the application, referencing the root div for React rendering.
-- `tailwind.config.js` and `postcss.config.js`: Configuration files for Tailwind CSS and PostCSS, setting up styling utilities and optimizations.
+You can list a the tech stack that you've used over here
 
-## Technical Implementation
+- [React.js](https://reactjs.org/)
+- [Bootstrap](https://getbootstrap.com)
 
-### React Framework
+## Getting Started
 
-The application is built using React, leveraging functional components and hooks for stateful logic. React Router is utilized for SPA navigation, and React Query manages data fetching, caching, and synchronization.
+### Installing
 
-#### React Query
+This is where you list how to get the project started. It typically just includes telling a person to clone the repo and then to install the dependencies e.g.
 
-React Query enhances the data fetching process, enabling efficient data synchronization between the API and the UI, reducing boilerplate, and improving user experience with background updates and caching.
+1. Clone the repo:
 
-#### Zustand
+```bash
+git clone git@github.com:NoroffFEU/portfolio-1-example.git
+```
 
-Zustand provides a minimalistic solution for state management, chosen for its simplicity and React hooks integration. It facilitates global state without the boilerplate of Redux, making state management straightforward and efficient.
+2. Install the dependencies:
 
-### Tailwind CSS for Styling
+```
+npm install
+```
 
-Tailwind CSS offers a utility-first approach to styling, enabling rapid UI development with responsiveness and customization. The project leverages Tailwind for consistent design patterns and efficient styling across components.
+### Running
 
-#### DaisyUI
+Here is where you detail how to run the app. It typically involves the commands you'd need to run to start the project e.g.
 
-DaisyUI, a plugin for Tailwind, provides pre-designed components and themes, which are used to maintain UI consistency and accelerate the development process.
+To run the app, run the following commands:
 
-## API Integration
+```bash
+npm run start
+```
 
-The application interacts with the Holidaze API, abstracting API calls within custom hooks. This encapsulation improves code readability and reuse, centralizing API logic for venues, bookings, and user authentication.
+## Contributing
 
-### Custom Hooks
+Here you can detail any information you want to provide regarding contributing to the project. For big projects you will usually have a separate `CONTRIBUTING.md` and link to it, but for smaller projects you can simply include instructions here. These instructions can simply detail the process you want a person to take, such as to make sure to open a pull request so code can be reviewed.
 
-- `useVenuesApi`: Manages venue-related operations (CRUD).
-- `useBookingsApi`: Handles booking operations, including fetching and managing bookings.
-- `useAuthHooks`: Encapsulates authentication logic, including user login, registration, and profile updates.
+## Contact
 
-## State Management with Zustand
+This is where you can leave your social links for people to contact you, such as a LinkedIn profile or Twitter link e.g.
 
-Zustand stores manage application-wide state, such as user authentication status and venue data. The use of Zustand simplifies state updates and access across components, enhancing the application's reactivity.
+[My Twitter page](www.twitter.com)
 
-## Responsive Design and Accessibility
+[My LinkedIn page](www.linkedin.com)
 
-Tailwind CSS's utility classes are utilized to create a responsive layout that adapts to various screen sizes. Accessibility considerations are addressed through semantic HTML and ARIA labels, ensuring the application is accessible to a broader audience.
+## License
 
-## Development and Build Process
+You can link to your license file here if you're using one, or mention what license the codebase falls under. If you're unsure then you can simply delete this section.
 
-- Vite is chosen as the build tool for its fast build times and out-of-the-box React support.
-- ESLint ensures code quality and consistency across the project.
+## Acknowledgments
 
-## Future Directions
-
-- **Performance Optimization**: Exploration of code splitting and lazy loading for performance improvements.
-- **Feature Expansion**: Potential features include advanced search and filtering, user reviews, and enhanced venue management capabilities.
-
-## Conclusion
-
-This documentation provides a deep dive into the Holidaze accommodation booking site's development, highlighting the architectural choices, technical implementations, and the rationale behind these decisions. The application demonstrates a modern approach to web development using React, Zustand, React Query, and Tailwind CSS, focusing on usability, maintainability, and scalability.
+This is where you can add any acknowledgements if you'd like, such as to people who have helped you or any code snippets you'd like to mention. You can delete this section if you don't have any acknowledgements to make.
