@@ -12,8 +12,7 @@ const VenueList = ({ hideDescription }) => {
       {venues.map(venue => (
         <div key={venue.id} className="flex flex-col">
           <Link to={`/venue/${venue.id}`} className="no-underline">
-            {/* Pass hideDescription prop to VenueItem */}
-            <VenueItem data={venue} hideDescription={hideDescription} />
+            <VenueItem data={venue} hideDescription={true} />
           </Link>
         </div>
       ))}
