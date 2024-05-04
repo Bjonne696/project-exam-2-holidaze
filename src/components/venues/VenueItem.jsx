@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { useNavigate } from 'react-router-dom';
 import { useDeleteVenue } from '../../hooks/useVenuesApi';
 
-const VenueItem = ({ data, isDetailedView = false, showActions = false, onDeleteClick, hideDescription = false }) => {
+const VenueItem = ({ data, isDetailedView = false, showActions = false, onDeleteClick, hideDescription }) => {
   const { name, description, media, rating, maxGuests, price } = data;
   const [imageError, setImageError] = useState(false);
   const navigate = useNavigate();
@@ -16,7 +16,6 @@ const VenueItem = ({ data, isDetailedView = false, showActions = false, onDelete
       },
     });
   };
-
 
   return (
     <div className="bg-card-background shadow-lg rounded-lg overflow-hidden my-2 sm:my-4 p-4 h-100">
@@ -32,7 +31,7 @@ const VenueItem = ({ data, isDetailedView = false, showActions = false, onDelete
         <p className="mt-2 text-gray-600">Price: {price}</p>
         <p className="mt-2 text-gray-600">Max Guests: {maxGuests}</p>
         <p className="mt-2 text-gray-600">Rating: {rating} ★</p>
-        {!hideDescription && <p className="mt-2 text-gray-600">{description}</p>}
+        {!hideDescription && <p className="mt-2 text-gray-600">Description: {description}</p>}
         {showActions && (
           <div className="flex justify-between mt-4">
             <button className="btn btn-primary" onClick={() => navigate(`/update-venue/${data.id}`)}>Update</button>
@@ -63,7 +62,7 @@ VenueItem.propTypes = {
   isDetailedView: PropTypes.bool,
   showActions: PropTypes.bool,
   onDeleteClick: PropTypes.func,
-  hideDescription: PropTypes.bool,
+  hideDescription: PropTypes.bool.isRequired, 
 };
 
 export default VenueItem;

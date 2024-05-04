@@ -1,12 +1,9 @@
-
-
 import React, { useEffect } from 'react';
 import useVenuesStore from '../stores/venuesStore';
 import VenueList from "../components/venues/VenueList";
 import VenueFilter from "../components/venues/VenueFilter";
 
 const HomePage = () => {
-
   const { fetchAllVenues, venues, isLoading, error } = useVenuesStore(state => ({
     fetchAllVenues: state.fetchAllVenues,
     venues: state.venues,
@@ -24,7 +21,8 @@ const HomePage = () => {
   return (
     <div className="container mx-auto">
       <VenueFilter venues={venues} />
-      <VenueList />
+      {/* Pass hideDescription prop as true */}
+      <VenueList hideDescription={true} />
     </div>
   );
 };

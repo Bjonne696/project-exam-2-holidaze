@@ -4,7 +4,7 @@ import VenueItem from './VenueItem';
 import PropTypes from 'prop-types';
 import useVenuesStore from '../../stores/venuesStore';
 
-const VenueList = () => {
+const VenueList = ({ hideDescription }) => {
   const venues = useVenuesStore(state => state.venues);
 
   return (
@@ -21,14 +21,7 @@ const VenueList = () => {
 };
 
 VenueList.propTypes = {
-  venues: PropTypes.arrayOf(PropTypes.shape({
-    id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
-    name: PropTypes.string,
-    media: PropTypes.arrayOf(PropTypes.string),
-    rating: PropTypes.number,
-    price: PropTypes.number,
-    maxGuests: PropTypes.number,
-  })),
+  hideDescription: PropTypes.bool.isRequired,
 };
 
 export default VenueList;

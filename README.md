@@ -1,79 +1,80 @@
-# Holidaze Accommodation Booking Site - Technical Documentation
+# Holidaze Accommodation Booking
 
-## Overview
+![image](https://github.com/Bjonne696/project-exam-2-holidaze/blob/main/src/assets/holidaze.png?raw=true)
 
-Holidaze is a dual-faceted web application designed to facilitate accommodation bookings and venue management. This document delves into the technical architecture, front-end implementation, integration with external APIs, state management, and UI design using Tailwind CSS.
+Holidaze is an innovative accommodation booking site designed to facilitate easy and efficient booking experiences for customers, and venue management for accommodation providers. This React application integrates with the Holidaze API to provide a seamless front-end user experience for booking holidays and managing accommodation listings.
 
-## Project Structure
+## Description
 
-The project adopts a modular architecture, segregating functionalities into components, hooks, pages, and stores for state management. This structure promotes reusability, maintainability, and scalability.
+The Holidaze application was developed as part of a project exam to showcase the culmination of skills learned in web development. The application features two main interfaces: a customer-facing site for booking accommodations and an admin-facing side for venue management. Key functionalities include:
 
-### Directory Layout
+- Viewing a list of available venues
+- Searching for venues based on criteria
+- Detailed venue pages with availability calendars
+- User registration and login, with different roles for customers and venue managers
+- Venue management for registered venue managers, including the ability to create, update, and delete listings
+- Booking management for registered customers
 
-- `src/components`: Contains UI components, further categorized into `layout` and `venues` for organizational clarity.
-- `src/pages`: Houses components that represent full pages, serving as the primary entry points for the application's various features.
-- `src/hooks`: Custom React hooks for business logic encapsulation, including API calls and state manipulation.
-- `src/stores`: Implements Zustand for global state management across the application, with distinct stores for authentication, bookings, and venues.
-- `src/constants`: Centralizes configuration values such as the API base URL for easy management and updates.
-- `src/assets`: Static assets like images or icons used across the application.
+## Built With
 
-### Key Files
+This project leverages modern web development technologies, including:
 
-- `App.jsx`: Defines the routing logic using React Router, mapping URLs to components.
-- `main.jsx`: The entry point for the React application, setting up the React Query client and wrapping the app in necessary providers.
-- `index.html`: The HTML template for the application, referencing the root div for React rendering.
-- `tailwind.config.js` and `postcss.config.js`: Configuration files for Tailwind CSS and PostCSS, setting up styling utilities and optimizations.
+- [React.js](https://reactjs.org/) for building the user interface
+- [Bootstrap](https://getbootstrap.com) for styling and layout
+- [@tanstack/react-query](https://tanstack.com/query/v4) for server state management
+- [React Router DOM](https://reactrouter.com/) for navigation
+- [Styled Components](https://styled-components.com/) for component-level styling
+- [Zustand](https://github.com/pmndrs/zustand) for global state management
+- Hosted on [Netlify](https://www.netlify.com/), ensuring optimal performance and security
 
-## Technical Implementation
+## Getting Started
 
-### React Framework
+To run Holidaze locally, follow these steps:
 
-The application is built using React, leveraging functional components and hooks for stateful logic. React Router is utilized for SPA navigation, and React Query manages data fetching, caching, and synchronization.
+### Installing
 
-#### React Query
+1. Clone the repo to your local machine:
 
-React Query enhances the data fetching process, enabling efficient data synchronization between the API and the UI, reducing boilerplate, and improving user experience with background updates and caching.
+```bash
+git clone https://github.com/Bjonne696/project-exam-2-holidaze.git
+```
 
-#### Zustand
+2. Install the dependencies:
 
-Zustand provides a minimalistic solution for state management, chosen for its simplicity and React hooks integration. It facilitates global state without the boilerplate of Redux, making state management straightforward and efficient.
+```
+npm install
+```
 
-### Tailwind CSS for Styling
+### Running
 
-Tailwind CSS offers a utility-first approach to styling, enabling rapid UI development with responsiveness and customization. The project leverages Tailwind for consistent design patterns and efficient styling across components.
+To start the application locally, run:
 
-#### DaisyUI
+```bash
+npm run dev
+```
 
-DaisyUI, a plugin for Tailwind, provides pre-designed components and themes, which are used to maintain UI consistency and accelerate the development process.
+To create a user, register with a @stud.noroff.no account.
 
-## API Integration
+## Contributing
 
-The application interacts with the Holidaze API, abstracting API calls within custom hooks. This encapsulation improves code readability and reuse, centralizing API logic for venues, bookings, and user authentication.
+Contributions make the open-source community an amazing place to learn, inspire, and create. Any contributions to ShopEase are greatly appreciated. Here's how you can contribute:
 
-### Custom Hooks
+1. Fork the Project
+2. Create your Feature Branch (**`git checkout -b feature/AmazingFeature`**)
+3. Commit your Changes (**`git commit -m 'Add some AmazingFeature'`**)
+4. Push to the Branch (**`git push origin feature/AmazingFeature`**)
+5. Open a Pull Request
 
-- `useVenuesApi`: Manages venue-related operations (CRUD).
-- `useBookingsApi`: Handles booking operations, including fetching and managing bookings.
-- `useAuthHooks`: Encapsulates authentication logic, including user login, registration, and profile updates.
+## Contact
 
-## State Management with Zustand
+For any questions or to contribute, please connect through:
 
-Zustand stores manage application-wide state, such as user authentication status and venue data. The use of Zustand simplifies state updates and access across components, enhancing the application's reactivity.
+[My email](mailto:Bjonne696@gmail.com)
 
-## Responsive Design and Accessibility
+## License
 
-Tailwind CSS's utility classes are utilized to create a responsive layout that adapts to various screen sizes. Accessibility considerations are addressed through semantic HTML and ARIA labels, ensuring the application is accessible to a broader audience.
+This project is licensed under the MIT License - see `LICENSE` for more details.
 
-## Development and Build Process
+## Acknowledgments
 
-- Vite is chosen as the build tool for its fast build times and out-of-the-box React support.
-- ESLint ensures code quality and consistency across the project.
-
-## Future Directions
-
-- **Performance Optimization**: Exploration of code splitting and lazy loading for performance improvements.
-- **Feature Expansion**: Potential features include advanced search and filtering, user reviews, and enhanced venue management capabilities.
-
-## Conclusion
-
-This documentation provides a deep dive into the Holidaze accommodation booking site's development, highlighting the architectural choices, technical implementations, and the rationale behind these decisions. The application demonstrates a modern approach to web development using React, Zustand, React Query, and Tailwind CSS, focusing on usability, maintainability, and scalability.
+Thanks to Noroff School of Technology and Digital Media for providing the API and documentation.
