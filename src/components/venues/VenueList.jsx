@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import VenueItem from './VenueItem';
@@ -13,7 +12,7 @@ const VenueList = () => {
       {venues.map(venue => (
         <div key={venue.id} className="flex flex-col">
           <Link to={`/venue/${venue.id}`} className="no-underline">
-            <VenueItem data={venue} />
+            <VenueItem data={venue} hideDescription={true} />
           </Link>
         </div>
       ))}
