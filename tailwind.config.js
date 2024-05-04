@@ -13,6 +13,7 @@ export default {
 		  'border-custom': '#810f0f',
 		},
 		height: {
+
 		  '100': '25rem',
 		},
 
