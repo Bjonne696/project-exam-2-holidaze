@@ -13,8 +13,10 @@ export default {
 		  'border-custom': '#810f0f',
 		},
 		height: {
-			'100': '25rem',
-		  },
+
+		  '100': '25rem',
+		},
+
 		borderRadius: {
 		  '25px': '25px',
 		},
