@@ -19,9 +19,17 @@ const LoginPage = () => {
         useAuthStore.getState().setToken(data.accessToken); 
         navigate('/'); 
       },
+      onError: (error) => { 
+        let errorMessage = 'An unknown error occurred';
+        if (error.message) {
+          errorMessage = error.message;
+        } else if (error.response && error.response.data && error.response.data.message) {
+          errorMessage = error.response.data.message;
+        }
+        setErrorMessage(errorMessage);
+      }
     });
   };
-
   const buttonStyle = "border border-#810f0f rounded-full text-center px-4 py-2 bg-card-background mx-auto";
 
   return (
@@ -30,7 +38,7 @@ const LoginPage = () => {
         {isError && (
           <div className="alert alert-error shadow-lg">
             <div>
-              <span>Error logging in:</span> {error?.message || 'An unknown error occurred'}
+              <span>Error during registration:</span> {error.message}
             </div>
           </div>
         )}
