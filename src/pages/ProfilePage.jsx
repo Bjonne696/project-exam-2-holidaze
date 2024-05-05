@@ -38,6 +38,9 @@ const ProfilePage = () => {
   };
 
   const handleDeleteBooking = (bookingId) => {
+    const confirmDelete = window.confirm('Are you sure you want to delete this booking?');
+    if (!confirmDelete) return;
+    
     deleteBookingMutation.mutate(bookingId, {
       onSuccess: () => {
         alert('Booking deleted successfully');
@@ -79,6 +82,8 @@ const ProfilePage = () => {
   
   const buttonStyleDelete = "rounded-full text-center px-4 py-2 bg-red-500 hover:bg-red-600 text-black";
   
+  // Update the color for the card displaying the bookings
+  const cardStyle = "p-4 rounded shadow-sm bg-amber-200"; 
 
   return (
     <div className="container mx-auto p-4">
@@ -104,7 +109,7 @@ const ProfilePage = () => {
       <div className="space-y-4">
         {bookings && bookings.length > 0 ? (
           bookings.map((booking) => (
-            <div key={booking.id} className="p-4 border rounded shadow-sm">
+            <div key={booking.id} className={cardStyle}> {/* Apply the card style */}
               <p><strong>Venue:</strong> {booking.venue?.name}</p>
               <p><strong>From:</strong> {new Date(booking.dateFrom).toLocaleDateString()}</p>
               <p><strong>To:</strong> {new Date(booking.dateTo).toLocaleDateString()}</p>
