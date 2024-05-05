@@ -18,7 +18,7 @@ const VenueItem = ({ data, isDetailedView = false, showActions = false, onDelete
   };
 
   return (
-    <div className="bg-card-background shadow-lg rounded-lg overflow-hidden my-2 sm:my-4 p-4 h-100">
+    <div className="bg-amber-200 shadow-lg rounded-lg overflow-hidden my-2 sm:my-4 p-4 h-100">
       {media.length > 0 && !imageError ? (
         <img src={media[0]} alt={name} className="h-52 w-full object-cover" />
       ) : (
