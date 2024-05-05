@@ -29,6 +29,7 @@ const updateAuthState = (data, queryClient) => {
 
 export const useRegisterUser = () => {
   const queryClient = useQueryClient();
+  
   return useMutation({
     mutationFn: async (userData) => {
       const response = await fetch(`${BASE_URL}/auth/register`, {
@@ -36,17 +37,19 @@ export const useRegisterUser = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(userData),
       });
+
       if (!response.ok) {
         const errorResponse = await response.json(); 
-        throw new Error(errorResponse.message || 'Failed to register');
+        if (errorResponse && errorResponse.errors && errorResponse.errors.length > 0 && errorResponse.errors[0].message) {
+          throw new Error(errorResponse.errors[0].message); // Throw error with message from API response
+        } else {
+          throw new Error('An unknown error occurred'); // Throw a generic error message
+        }
       }
+
       return response.json();
     },
     onSuccess: (data) => updateAuthState(data, queryClient),
-    onError: (error) => {
-      console.error("Registration error:", error);
-      useAuthStore.getState().setError(error.message || 'Failed to register');
-    },
   });
 };
 
@@ -59,14 +62,18 @@ export const useLoginUser = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(credentials),
       });
-      if (!response.ok) throw new Error('Failed to login');
+      if (!response.ok) {
+        const errorResponse = await response.json(); 
+        if (errorResponse && errorResponse.errors && errorResponse.errors.length > 0 && errorResponse.errors[0].message) {
+          throw new Error(errorResponse.errors[0].message); // Throw error with message from API response
+        } else {
+          throw new Error('An unknown error occurred'); // Throw a generic error message
+        }
+      }
+
       return response.json();
     },
     onSuccess: (data) => updateAuthState(data, queryClient),
-    onError: (error) => {
-      console.error("Login error:", error);
-      useAuthStore.getState().setError(error.message || 'Failed to login');
-    },
   });
 };
 
@@ -81,11 +88,15 @@ export const becomeVenueManager = async (token, name) => {
   });
 
   if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.message || 'Failed to become venue manager');
+    const errorResponse = await response.json(); 
+    if (errorResponse && errorResponse.errors && errorResponse.errors.length > 0 && errorResponse.errors[0].message) {
+      throw new Error(errorResponse.errors[0].message); // Throw error with message from API response
+    } else {
+      throw new Error('An unknown error occurred'); // Throw a generic error message
+    }
   }
 
-  return await response.json();
+  return response.json();
 };
 
 export const revokeVenueManagerStatus = async (token, name) => {
@@ -99,8 +110,12 @@ export const revokeVenueManagerStatus = async (token, name) => {
   });
 
   if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.message || 'Failed to revoke venue manager status');
+    const errorResponse = await response.json(); 
+    if (errorResponse && errorResponse.errors && errorResponse.errors.length > 0 && errorResponse.errors[0].message) {
+      throw new Error(errorResponse.errors[0].message); // Throw error with message from API response
+    } else {
+      throw new Error('An unknown error occurred'); // Throw a generic error message
+    }
   }
 
   return response.json();
@@ -125,9 +140,14 @@ export const useUpdateProfileMedia = () => {
         body: JSON.stringify({ avatar }),
       });
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to update avatar');
+        const errorResponse = await response.json(); 
+        if (errorResponse && errorResponse.errors && errorResponse.errors.length > 0 && errorResponse.errors[0].message) {
+          throw new Error(errorResponse.errors[0].message); // Throw error with message from API response
+        } else {
+          throw new Error('An unknown error occurred'); // Throw a generic error message
+        }
       }
+
       return response.json();
     },
     onSuccess: (data) => {

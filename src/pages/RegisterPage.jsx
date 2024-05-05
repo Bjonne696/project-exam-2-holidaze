@@ -13,7 +13,8 @@ const RegisterPage = () => {
   });
 
   const navigate = useNavigate();
-  const { mutate: registerUser, isError, error, isLoading } = useRegisterUser();
+  const { mutate: registerUser, error, isLoading } = useRegisterUser(); 
+  const [errorMessage, setErrorMessage] = useState(null); 
   
   const handleChange = (e) => {
     const value = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
@@ -27,6 +28,15 @@ const RegisterPage = () => {
         useAuthStore.getState().setToken(data.accessToken);
         navigate('/');
       },
+      onError: (error) => { 
+        let errorMessage = 'An unknown error occurred';
+        if (error.message) {
+          errorMessage = error.message;
+        } else if (error.response && error.response.data && error.response.data.message) {
+          errorMessage = error.response.data.message;
+        }
+        setErrorMessage(errorMessage);
+      }
     });
   };
 
@@ -35,10 +45,10 @@ const RegisterPage = () => {
   return (
     <div className="min-h-screen flex flex-col justify-center items-center">
       <div className="w-full max-w-md p-8 space-y-4 bg-white rounded-lg shadow-md">
-        {isError && (
+        {error && (
           <div className="alert alert-error shadow-lg">
             <div>
-              <span>Error during registration:</span> {error?.message || 'An unknown error occurred'}
+              <span>Error during registration:</span> {error.message}
             </div>
           </div>
         )}
