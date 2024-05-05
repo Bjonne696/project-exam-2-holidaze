@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useRegisterUser } from '../hooks/useAuthHooks';
 import useAuthStore from '../stores/authStore';
 
@@ -12,10 +12,10 @@ const RegisterPage = () => {
     venueManager: false,
   });
 
-  const navigate = useNavigate();
   const { mutate: registerUser, error, isLoading } = useRegisterUser(); 
-  const [errorMessage, setErrorMessage] = useState(null); 
-  
+  const [errorMessage, setErrorMessage] = useState(null);
+  const [successMessage, setSuccessMessage] = useState(null); // Add success message state
+
   const handleChange = (e) => {
     const value = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
     setFormData({ ...formData, [e.target.name]: value });
@@ -26,7 +26,7 @@ const RegisterPage = () => {
     registerUser(formData, {
       onSuccess: (data) => {
         useAuthStore.getState().setToken(data.accessToken);
-        navigate('/');
+        setSuccessMessage("Registration successful!"); // Set success message
       },
       onError: (error) => { 
         let errorMessage = 'An unknown error occurred';
@@ -49,6 +49,14 @@ const RegisterPage = () => {
           <div className="alert alert-error shadow-lg">
             <div>
               <span>Error during registration:</span> {error.message}
+            </div>
+          </div>
+        )}
+
+        {successMessage && ( // Display success message if exists
+          <div className="alert alert-success shadow-lg">
+            <div>
+              {successMessage}
             </div>
           </div>
         )}
