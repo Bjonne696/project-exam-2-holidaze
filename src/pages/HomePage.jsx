@@ -21,7 +21,6 @@ const HomePage = () => {
   return (
     <div className="container mx-auto">
       <VenueFilter venues={venues} />
-      {/* Pass hideDescription prop as true */}
       <VenueList hideDescription={true} />
     </div>
   );

@@ -76,13 +76,11 @@ const ProfilePage = () => {
   if (isLoadingBookings) return <div>Loading bookings...</div>;
   if (bookingsError) return <div>Error: {bookingsError.message}</div>;
 
-  const buttonStyle = "rounded-full text-center px-4 py-2 bg-green-300 hover:bg-green-400 text-black";
+      //Styles//    
 
+  const buttonStyle = "rounded-full text-center px-4 py-2 bg-green-300 hover:bg-green-400 text-black";
   const buttonStyleRed = "rounded-full text-center px-4 py-2 bg-red-500 hover:bg-red-600 text-black";
-  
   const buttonStyleDelete = "rounded-full text-center px-4 py-2 bg-red-500 hover:bg-red-600 text-black";
-  
-  // Update the color for the card displaying the bookings
   const cardStyle = "p-4 rounded shadow-sm bg-amber-200"; 
 
   return (

@@ -20,7 +20,6 @@ function VenuePage() {
   const createBookingMutation = useCreateBooking();
 
   useEffect(() => {
-   
     const dates = venue?.bookings?.reduce((acc, booking) => {
       let currentDate = new Date(booking.dateFrom);
       const endDate = new Date(booking.dateTo);
@@ -59,27 +58,48 @@ function VenuePage() {
     });
   };
 
+  // Limit the number of guests to the maximum allowed for the venue
+  useEffect(() => {
+    if (venue && guests > venue.maxGuests) {
+      setGuests(venue.maxGuests);
+    }
+  }, [venue, guests]);
+
   if (venueLoading) return <div>Loading...</div>;
   if (venueError) return <div>Error loading venue details: {venueError.message}</div>;
 
   return (
     <div>
       {venue && <VenueItem data={venue} isDetailedView={true} />} {/* Removed hideDescription prop */}
-      <h2>Create a Booking</h2>
-      <DatePicker
-        selected={startDate}
-        onChange={([start, end]) => {
-          setStartDate(start);
-          setEndDate(end);
-        }}
-        startDate={startDate}
-        endDate={endDate}
-        excludeDates={unavailableDates}
-        selectsRange
-        inline
-      />
-      <input type="number" value={guests} onChange={(e) => setGuests(Number(e.target.value))} placeholder="Number of Guests" />
-      <button onClick={handleBookingSubmit}>Create Booking</button>
+      <h2 className="mr-4">Create a Booking</h2>
+      <div className="flex flex-wrap items-center">
+        
+        <div className="mr-4">
+          <DatePicker
+            selected={startDate}
+            onChange={([start, end]) => {
+              setStartDate(start);
+              setEndDate(end);
+            }}
+            startDate={startDate}
+            endDate={endDate}
+            excludeDates={unavailableDates}
+            selectsRange
+            inline
+          />
+        </div>
+        <div className="mr-4">
+          <label className="block mb-2">
+            Number of Guests:
+            <select className="mt-1 form-select" value={guests} onChange={(e) => setGuests(Number(e.target.value))}>
+              {[...Array(venue.maxGuests)].map((_, index) => (
+                <option key={index + 1} value={index + 1}>{index + 1}</option>
+              ))}
+            </select>
+          </label>
+        </div>
+        <button className="btn btn-primary" onClick={handleBookingSubmit}>Create Booking</button>
+      </div>
       <div className="my-8">
         <h2 className="text-xl font-bold">Unavailable for booking during these dates:</h2>
         {venue?.bookings && venue.bookings.length > 0 ? (
