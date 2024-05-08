@@ -41,7 +41,7 @@ function Layout() {
           <div className="flex items-center space-x-4">
             {/* Wrap "Holidaze" text and hero banner in NavLink */}
             <NavLink to="/" className="flex items-center space-x-4">
-              <h1 className="text-4xl font-bold text-gray-800 cursor-pointer">Holidaze</h1>
+              <h1 className="text-4xl font-custom text-gray-800 cursor-pointer">Holidaze</h1>
               {/* Conditionally display the hero banner next to the title on larger screens */}
               <img src={heroBanner} alt="Hero Banner" className="w-20 h-20 md:w-32 md:h-32 object-cover hidden sm:block cursor-pointer" />
             </NavLink>
