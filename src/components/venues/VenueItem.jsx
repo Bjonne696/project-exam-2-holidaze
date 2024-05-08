@@ -18,7 +18,7 @@ const VenueItem = ({ data, isDetailedView = false, showActions = false, onDelete
   };
 
   return (
-    <div className="bg-amber-200 shadow-lg rounded-lg overflow-hidden my-2 sm:my-4 p-4 h-100">
+    <div className="bg-amber-200 shadow-lg rounded-lg overflow-hidden my-2 sm:my-4 p-4">
       {media.length > 0 && !imageError ? (
         <img src={media[0]} alt={name} className="h-52 w-full object-cover" />
       ) : (
@@ -27,7 +27,7 @@ const VenueItem = ({ data, isDetailedView = false, showActions = false, onDelete
         </div>
       )}
       <div className="p-4">
-        <h2 className="text-xl font-bold">{name}</h2>
+        <h2 className="text-xl font-bold mb-2 mt-2 h-22 overflow-hidden">{name}</h2>
         <p className="mt-2 text-gray-600">Price: {price}</p>
         <p className="mt-2 text-gray-600">Max Guests: {maxGuests}</p>
         <p className="mt-2 text-gray-600">Rating: {rating} ★</p>

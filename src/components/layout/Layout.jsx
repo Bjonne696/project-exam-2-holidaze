@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { NavLink, Outlet } from 'react-router-dom';
 import useAuthStore from '../../stores/authStore';
-import heroBanner from '../../assets/logo.png'; // Verify the path is correct
+import heroBanner from '../../assets/logo.png';
 
 function Layout() {
   const { logoutUser, token, user } = useAuthStore((state) => ({

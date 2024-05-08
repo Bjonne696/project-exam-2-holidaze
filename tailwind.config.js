@@ -12,11 +12,6 @@ export default {
 		  'card-background': '#F7FFF5',
 		  'border-custom': '#810f0f',
 		},
-		height: {
-
-		  '100': '25rem',
-		},
-
 		borderRadius: {
 		  '25px': '25px',
 		},
