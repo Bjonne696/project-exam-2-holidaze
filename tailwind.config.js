@@ -6,6 +6,9 @@ export default {
 	  "node_modules/react-daisyui/dist/**/*.js"
 	],
 	theme: {
+		fontFamily: {
+			'custom': ['megavolt', 'sans-serif'],
+		  },
 	  extend: {
 		colors: {
 		  'page-background': '#F9E9C3',
