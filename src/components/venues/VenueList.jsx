@@ -8,11 +8,11 @@ const VenueList = ({ hideDescription }) => {
   const venues = useVenuesStore(state => state.venues);
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+    <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
       {venues.map(venue => (
         <div key={venue.id} className="flex flex-col">
           <Link to={`/venue/${venue.id}`} className="no-underline">
-            <VenueItem data={venue} hideDescription={true} />
+            <VenueItem data={venue} hideDescription={hideDescription} />
           </Link>
         </div>
       ))}

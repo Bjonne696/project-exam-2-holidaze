@@ -70,7 +70,20 @@ function VenuePage() {
 
   return (
     <div>
-      {venue && <VenueItem data={venue} isDetailedView={true} />} {/* Removed hideDescription prop */}
+      {venue && (
+        <div className="venue-item-wrapper">
+          <VenueItem data={venue} isDetailedView={true} />
+        </div>
+      )}
+      <style>
+        {`
+          .venue-item-wrapper img {
+            max-height: 300px;
+            width: auto;
+            height: auto;
+          }
+        `}
+      </style>
       <h2 className="mr-4">Create a Booking</h2>
       <div className="flex flex-wrap items-center">
         
@@ -116,6 +129,6 @@ function VenuePage() {
       </div>
     </div>
   );
-};
+}
 
 export default VenuePage;
