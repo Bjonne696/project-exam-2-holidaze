@@ -27,8 +27,8 @@ const VenueItem = ({ data, isDetailedView = false, showActions = false, onDelete
         </div>
       )}
       <div className="p-4">
-        <h2 className="text-xl font-bold mb-2 mt-2 h-22 overflow-hidden">{name}</h2>
-        <p className="mt-2 text-gray-600">Price: {price}</p>
+        <h2 className="text-xl font-bold mb-2 mt-2 h-22 overflow-hidden whitespace-nowrap overflow-ellipsis">{name}</h2>
+        <p className="mt-2 text-gray-600">Price: ${price}</p>
         <p className="mt-2 text-gray-600">Max Guests: {maxGuests}</p>
         <p className="mt-2 text-gray-600">Rating: {rating} ★</p>
         {!hideDescription && <p className="mt-2 text-gray-600">Description: {description}</p>}
