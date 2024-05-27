@@ -1,5 +1,5 @@
 /**
- * @file api.js
+ * @constants/api.js
  * This file contains the base URL configuration for the Holidaze API.
  */
 
