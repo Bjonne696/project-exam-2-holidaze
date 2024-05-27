@@ -1,10 +1,16 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useCreateVenue } from '../../hooks/useVenuesApi'; 
+import { useCreateVenue } from '../../hooks/useVenuesApi'; // Custom hook for creating a venue
 
+/**
+ * The CreateVenueForm component allows users to fill out a form to create a new venue.
+ * It handles form state, submission, and form data validation.
+ */
 const CreateVenueForm = () => {
-  const navigate = useNavigate();
-  const { mutate: createVenue, error, isLoading } = useCreateVenue(); 
+  const navigate = useNavigate(); // Hook for navigation
+  const { mutate: createVenue, error, isLoading } = useCreateVenue(); // Custom hook to handle venue creation
+
+  // State to manage form data
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -29,27 +35,31 @@ const CreateVenueForm = () => {
     },
   });
 
+  /**
+   * Handles changes to the form fields.
+   * Updates the formData state based on the input type and name.
+   */
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
 
-
+    // Special handling for media URLs
     if (name === 'media') {
-      const mediaUrls = value.split(',').map(url => url.trim()); 
+      const mediaUrls = value.split(',').map(url => url.trim()); // Split and trim the URLs
       setFormData(prevState => ({
         ...prevState,
         media: mediaUrls,
       }));
-    } else if (name in formData.meta) {
+    } else if (name in formData.meta) { // Handling for meta fields
       setFormData(prevState => ({
         ...prevState,
         meta: { ...prevState.meta, [name]: type === 'checkbox' ? checked : value },
       }));
-    } else if (name in formData.location) {
+    } else if (name in formData.location) { // Handling for location fields
       setFormData(prevState => ({
         ...prevState,
         location: { ...prevState.location, [name]: value },
       }));
-    } else {
+    } else { // Default handling for other fields
       setFormData(prevState => ({
         ...prevState,
         [name]: type === 'checkbox' ? checked : value,
@@ -57,37 +67,44 @@ const CreateVenueForm = () => {
     }
   };
 
+  /**
+   * Handles form submission.
+   * Validates and prepares the form data before calling the createVenue function.
+   */
   const handleSubmit = (e) => {
-    e.preventDefault();
-  
+    e.preventDefault(); // Prevent default form submission
 
+    // Prepare form data for submission
     const submissionData = {
       ...formData,
-      price: parseFloat(formData.price),
-      maxGuests: parseInt(formData.maxGuests, 10),
-      rating: parseFloat(formData.rating),
+      price: parseFloat(formData.price), // Convert price to float
+      maxGuests: parseInt(formData.maxGuests, 10), // Convert maxGuests to integer
+      rating: parseFloat(formData.rating), // Convert rating to float
       location: {
         ...formData.location,
-        lat: formData.location.lat ? parseFloat(formData.location.lat) : 0,
-        lng: formData.location.lng ? parseFloat(formData.location.lng) : 0,
+        lat: formData.location.lat ? parseFloat(formData.location.lat) : 0, // Convert lat to float
+        lng: formData.location.lng ? parseFloat(formData.location.lng) : 0, // Convert lng to float
       },
     };
 
+    // Remove media field if empty
     if (!submissionData.media.length) {
       delete submissionData.media;
     }
-  
+
+    // Call the createVenue function with submission data
     createVenue(submissionData, {
       onSuccess: () => {
-        navigate('/manager-profile');
-        console.log("Submitting venue data:", submissionData);},
+        navigate('/manager-profile'); // Navigate to manager profile on success
+        console.log("Submitting venue data:", submissionData); // Log the submission data
+      },
     });
   };
 
-
+  // Display loading state
   if (isLoading) return <div>Creating venue...</div>;
+  // Display error state
   if (error) return <div>Error creating venue: {error.message}</div>;
-
 
   return (
     <div className="bg-page-background p-4 rounded-lg shadow-md">
@@ -142,7 +159,7 @@ const CreateVenueForm = () => {
             type="text"
             name="media"
             placeholder="Enter URLs separated by commas"
-            value={formData.media.join(', ')} 
+            value={formData.media.join(', ')} // Join media URLs into a comma-separated string
             onChange={handleChange}
             className="input input-bordered"
           />
