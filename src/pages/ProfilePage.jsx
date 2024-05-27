@@ -3,23 +3,29 @@ import { useFetchUserBookings, useDeleteBooking } from '../hooks/useBookingsApi'
 import useAuthStore from '../stores/authStore';
 import { useBecomeVenueManager, useRevokeVenueManagerStatus, useUpdateProfileMedia } from '../hooks/useAuthHooks';
 
+// Define the ProfilePage functional component
 const ProfilePage = () => {
+  // Extract user and token from global state
   const { user, token, setUser } = useAuthStore((state) => ({
     user: state.user,
     token: state.token,
     setUser: state.setUser,
   }));
 
+  // Define state variables and mutation functions for avatar update and venue manager status
   const [newAvatar, setNewAvatar] = useState('');
   const updateAvatarMutation = useUpdateProfileMedia();
   const revokeManagerStatusMutation = useRevokeVenueManagerStatus(); 
 
+  // Fetch user bookings and define mutation function for booking deletion
   const { data: bookings, isLoading: isLoadingBookings, error: bookingsError } = useFetchUserBookings({ userName: user?.name, token });
   const deleteBookingMutation = useDeleteBooking();
   const becomeVenueManagerMutation = useBecomeVenueManager();
 
+  //  Handle avatar change
   const handleAvatarChange = (e) => setNewAvatar(e.target.value);
 
+  //  Handle avatar submission
   const handleSubmitAvatar = () => {
     if (!newAvatar.trim()) {
       alert('Please enter a valid avatar URL.');
@@ -37,6 +43,7 @@ const ProfilePage = () => {
     });
   };
 
+  //  Handle booking deletion
   const handleDeleteBooking = (bookingId) => {
     const confirmDelete = window.confirm('Are you sure you want to delete this booking?');
     if (!confirmDelete) return;
@@ -51,6 +58,7 @@ const ProfilePage = () => {
     });
   };
 
+  //  Handle becoming a venue manager
   const handleBecomeVenueManagerClick = () => {
     becomeVenueManagerMutation.mutate(null, {
       onSuccess: (updatedUser) => {
@@ -60,7 +68,7 @@ const ProfilePage = () => {
     });
   };
 
- 
+  //  Handle revoking venue manager status
   const handleRevokeManagerStatusClick = () => {
     revokeManagerStatusMutation.mutate(null, {
       onSuccess: (updatedUser) => {
@@ -73,11 +81,12 @@ const ProfilePage = () => {
     });
   };
 
+  //  Display loading state while fetching bookings
   if (isLoadingBookings) return <div>Loading bookings...</div>;
+  //  Display error message if fetching bookings fails
   if (bookingsError) return <div>Error: {bookingsError.message}</div>;
 
-      //Styles//    
-
+  //  Define styles
   const buttonStyle = "rounded-full text-center px-4 py-2 bg-green-300 hover:bg-green-400 text-black";
   const buttonStyleRed = "rounded-full text-center px-4 py-2 bg-red-500 hover:bg-red-600 text-black";
   const buttonStyleDelete = "rounded-full text-center px-4 py-2 bg-red-500 hover:bg-red-600 text-black";
@@ -97,6 +106,7 @@ const ProfilePage = () => {
         <input type="text" value={newAvatar} onChange={handleAvatarChange} placeholder="New Avatar URL" className="input input-bordered w-full" />
         <button onClick={handleSubmitAvatar} className={`btn ${buttonStyle} mt-2`}>Update Avatar</button>
       </div>
+      {/*  Display buttons for becoming a venue manager or revoking manager status */}
       {!user?.venueManager ? (
         <button onClick={handleBecomeVenueManagerClick} className={`btn ${buttonStyle} btn my-4`}>Become Venue Manager</button>
       ) : (
@@ -106,12 +116,14 @@ const ProfilePage = () => {
       <h2 className="text-lg font-bold mt-4">Your Bookings</h2>
       <div className="space-y-4">
         {bookings && bookings.length > 0 ? (
+          //  Display user bookings
           bookings.map((booking) => (
-            <div key={booking.id} className={cardStyle}> {/* Apply the card style */}
+            <div key={booking.id} className={cardStyle}> 
               <p><strong>Venue:</strong> {booking.venue?.name}</p>
               <p><strong>From:</strong> {new Date(booking.dateFrom).toLocaleDateString()}</p>
               <p><strong>To:</strong> {new Date(booking.dateTo).toLocaleDateString()}</p>
               <p><strong>Guests:</strong> {booking.guests}</p>
+              {/* Button to delete booking */}
               <button onClick={() => handleDeleteBooking(booking.id)} className={`btn ${buttonStyleDelete}`}>Delete Booking</button>
             </div>
           ))
@@ -123,4 +135,5 @@ const ProfilePage = () => {
   );
 };
 
+// Export the ProfilePage component
 export default ProfilePage;

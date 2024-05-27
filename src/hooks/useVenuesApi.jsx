@@ -1,9 +1,9 @@
-
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState, useEffect } from 'react';
 import BASE_URL from '../constants/api';
 import useAuthStore from '../stores/authStore'; 
 
+// Function to fetch a batch of venues
 const fetchVenuesBatch = async (offset, limit = 100) => {
   try {
     const token = useAuthStore.getState().token; 
@@ -11,7 +11,6 @@ const fetchVenuesBatch = async (offset, limit = 100) => {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-      
         'Authorization': `Bearer ${token}`,
       },
     });
@@ -28,7 +27,7 @@ const fetchVenuesBatch = async (offset, limit = 100) => {
   }
 };
 
-
+// Custom hook to create a venue
 const useCreateVenue = () => {
   const queryClient = useQueryClient();
   return useMutation({
@@ -49,19 +48,13 @@ const useCreateVenue = () => {
       queryClient.invalidateQueries(['venues']);
     },
     onError: (error) => {
-
       console.error("Error creating venue:", error.response ? error.response.data : error);
-
     },
   });
 };
 
-
-
-
-
+// Custom hook to fetch venue by ID
 const useFetchVenueById = (venueId) => {
-
   const url = `${BASE_URL}/venues/${venueId}?_bookings=true`;
 
   return useQuery({
@@ -75,6 +68,7 @@ const useFetchVenueById = (venueId) => {
   });
 };
 
+// Custom hook to fetch venues managed by a user
 const useFetchManagedVenues = (name, token) => {
   return useQuery({
     queryKey: ['managedVenues', name],
@@ -95,65 +89,63 @@ const useFetchManagedVenues = (name, token) => {
   });
 };
   
- 
-  const useUpdateVenue = () => {
-    const queryClient = useQueryClient();
+// Custom hook to update a venue
+const useUpdateVenue = () => {
+  const queryClient = useQueryClient();
   
-    return useMutation({
-      mutationFn: async ({ venueId, formData }) => {
-        const token = localStorage.getItem('token');
-        const response = await fetch(`${BASE_URL}/venues/${venueId}`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`,
-          },
-          body: JSON.stringify(formData),
-        });
+  return useMutation({
+    mutationFn: async ({ venueId, formData }) => {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${BASE_URL}/venues/${venueId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to update venue');
+      }
+
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries('venues'); 
+    },
+  });
+};
   
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.message || 'Failed to update venue');
-        }
+// Custom hook to delete a venue
+const useDeleteVenue = () => {
+  const queryClient = useQueryClient();
   
-        return response.json();
-      },
-      onSuccess: () => {
+  return useMutation({
+    mutationFn: async (venueId) => {
+      const token = localStorage.getItem('token'); 
+      const response = await fetch(`${BASE_URL}/venues/${venueId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+      if (!response.ok) throw new Error('Failed to delete venue');
+      return response.ok; 
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(['venues']); 
+    },
+  });
+};  
 
-        queryClient.invalidateQueries('venues'); 
-      },
-    });
-  };
-  
-
-   const useDeleteVenue = () => {
-    const queryClient = useQueryClient();
-    return useMutation({
-      mutationFn: async (venueId) => {
-        const token = localStorage.getItem('token'); 
-        const response = await fetch(`${BASE_URL}/venues/${venueId}`, {
-          method: 'DELETE',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-          },
-        });
-        if (!response.ok) throw new Error('Failed to delete venue');
-        return response.ok; 
-      },
-      onSuccess: () => {
-        queryClient.invalidateQueries(['venues']); 
-      },
-    });
-  };  
-
-
-
-
-  export {
-    fetchVenuesBatch,
-    useCreateVenue,
-    useFetchVenueById,
-    useFetchManagedVenues, 
-    useUpdateVenue,
-    useDeleteVenue,
-  };
+// Exporting functions and hooks
+export {
+  fetchVenuesBatch,
+  useCreateVenue,
+  useFetchVenueById,
+  useFetchManagedVenues, 
+  useUpdateVenue,
+  useDeleteVenue,
+};
